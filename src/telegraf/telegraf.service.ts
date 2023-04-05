@@ -6,9 +6,10 @@ import { message } from 'telegraf/filters';
 @Injectable()
 export class TelegrafService {
   private bot: Telegraf<Context>;
-  private conversationHistory: Array<{ role: string; content: string }> = [
-    { role: 'system', content: 'You are a helpful assistant.' },
-  ];
+  private conversationHistories: Map<
+    number,
+    Array<{ role: string; content: string }>
+  > = new Map();
 
   constructor() {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
@@ -20,11 +21,24 @@ export class TelegrafService {
 
     this.bot.on(message('text'), async (ctx) => {
       const content = ctx.message.text;
-      this.conversationHistory.push({ role: 'user', content });
-      const response = await this.sendMessageToOpenAI(this.conversationHistory);
-      this.conversationHistory.push({ role: 'assistant', content: response });
+      const userId = ctx.message.from.id;
+
+      if (!this.conversationHistories.has(userId)) {
+        this.conversationHistories.set(userId, [
+          { role: 'system', content: 'You are a helpful assistant.' },
+        ]);
+      }
+
+      const userConversationHistory = this.conversationHistories.get(userId);
+      userConversationHistory.push({ role: 'user', content });
+      const response = await this.sendMessageToOpenAI(userConversationHistory);
+      userConversationHistory.push({ role: 'assistant', content: response });
+
       await ctx.reply(response);
-      console.log(this.conversationHistory);
+      console.log(
+        `Conversation history for user ${userId}:`,
+        userConversationHistory,
+      );
     });
 
     this.bot.launch();
@@ -56,7 +70,6 @@ export class TelegrafService {
           },
         },
       );
-
       const reply = response.data.choices[0].message.content;
       console.log('Received reply from OpenAI:', reply);
       return reply;
