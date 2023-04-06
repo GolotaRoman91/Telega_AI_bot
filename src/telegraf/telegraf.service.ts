@@ -22,12 +22,12 @@ export class TelegrafService {
   }
 
   private handleEchoCommand(ctx) {
-    const text = ctx.message?.text ?? '';
+    const text = ctx.message.text;
     ctx.reply(text.replace('/echo', '').trim());
   }
 
   private async handleTextMessage(ctx) {
-    const content = ctx.message?.text ?? '';
+    const content = ctx.message.text;
     const userId = ctx.message?.from?.id;
 
     if (!content || !userId) return;
@@ -40,6 +40,7 @@ export class TelegrafService {
       userConversationHistory,
     );
     userConversationHistory.push({ role: 'assistant', content: response });
+    // console.log(userConversationHistory);
 
     await ctx.reply(response);
   }
