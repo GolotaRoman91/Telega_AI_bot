@@ -27,22 +27,27 @@ export class TelegrafService {
   }
 
   private async handleTextMessage(ctx) {
-    const content = ctx.message.text;
+    const content = ctx.message?.text ?? '';
     const userId = ctx.message?.from?.id;
 
     if (!content || !userId) return;
 
     const userConversationHistory =
-      this.conversationHistoryService.getOrCreateConversationHistory(userId);
+      await this.conversationHistoryService.getOrCreateConversationHistory(
+        userId,
+      );
 
     userConversationHistory.push({ role: 'user', content });
     const response = await this.openAiService.getResponse(
       userConversationHistory,
     );
     userConversationHistory.push({ role: 'assistant', content: response });
-    // console.log(userConversationHistory);
 
     await ctx.reply(response);
+    await this.conversationHistoryService.updateConversationHistory(
+      userId,
+      userConversationHistory,
+    );
   }
 
   getBotInstance(): Telegraf<Context> {
