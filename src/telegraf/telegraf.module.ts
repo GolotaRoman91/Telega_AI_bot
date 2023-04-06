@@ -4,8 +4,11 @@ import { TelegrafController } from './telegraf.controller';
 import { Telegraf } from 'telegraf';
 import { OpenAiService } from './openai.service';
 import { ConversationHistoryService } from './conversation-history.service';
+import { SequelizeModule } from '@nestjs/sequelize';
+import { ConversationHistory } from './conversation-history.model';
 
 @Module({
+  imports: [SequelizeModule.forFeature([ConversationHistory])],
   providers: [
     TelegrafService,
     OpenAiService,
