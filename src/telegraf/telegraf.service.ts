@@ -17,8 +17,16 @@ export class TelegrafService {
   }
 
   private registerHandlers() {
+    this.bot.command('start', (ctx) => this.handleStartCommand(ctx));
     this.bot.command('echo', (ctx) => this.handleEchoCommand(ctx));
     this.bot.on('text', async (ctx) => await this.handleTextMessage(ctx));
+  }
+
+  private handleStartCommand(ctx) {
+    const welcomeMessage = `Welcome to the AI Assistant bot! 
+    I'm here to help you with any questions or concerns you may have. 
+    Feel free to ask me anything, and I'll do my best to assist you!`;
+    ctx.reply(welcomeMessage);
   }
 
   private handleEchoCommand(ctx) {
