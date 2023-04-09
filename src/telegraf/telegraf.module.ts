@@ -6,9 +6,10 @@ import { OpenAiService } from './openai.service';
 import { ConversationHistoryService } from './conversation-history.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { ConversationHistory } from './conversation-history.model';
+import { ArchivedDialog } from './archived-dialog.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([ConversationHistory])],
+  imports: [SequelizeModule.forFeature([ConversationHistory, ArchivedDialog])],
   providers: [
     TelegrafService,
     OpenAiService,
