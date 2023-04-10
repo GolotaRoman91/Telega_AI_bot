@@ -1,17 +1,19 @@
 import { Injectable } from '@nestjs/common';
-import { Telegraf, Context } from 'telegraf';
+import { Telegraf, Context, Markup } from 'telegraf';
 import { OpenAiService } from './openai.service';
 import { ConversationHistoryService } from './conversation-history.service';
 
 @Injectable()
 export class TelegrafService {
   private bot: Telegraf<Context>;
+  private userStartedConversation: Set<number>;
 
   constructor(
     private openAiService: OpenAiService,
     private conversationHistoryService: ConversationHistoryService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
+    this.userStartedConversation = new Set();
     this.registerHandlers();
     this.bot.launch();
   }
@@ -20,11 +22,34 @@ export class TelegrafService {
     this.bot.command('start', (ctx) => this.handleStartCommand(ctx));
     this.bot.command('echo', (ctx) => this.handleEchoCommand(ctx));
     this.bot.on('text', async (ctx) => await this.handleTextMessage(ctx));
+    this.bot.on('callback_query', (ctx) => this.handleCallbackQuery(ctx));
   }
 
   private handleStartCommand(ctx) {
     const welcomeMessage = `Welcome to the AI Assistant bot! 😊 I'm here to help you with any questions or concerns you may have. Feel free to ask me anything, and I'll do my best to assist you!`;
-    ctx.reply(welcomeMessage);
+
+    const inlineKeyboard = Markup.inlineKeyboard([
+      Markup.button.callback('Start conversation', 'start_conversation'),
+      Markup.button.callback('Conversation archive', 'conversation_archive'),
+    ]);
+
+    ctx.reply(welcomeMessage, inlineKeyboard);
+  }
+
+  private handleCallbackQuery(ctx) {
+    const userId = ctx.callbackQuery.from.id;
+    const data = ctx.callbackQuery.data;
+
+    if (data === 'start_conversation') {
+      this.userStartedConversation.add(userId);
+      ctx.reply(
+        'You have started a new conversation. You can now send messages.',
+      );
+    } else if (data === 'conversation_archive') {
+      // Handle displaying conversation archive
+    }
+
+    ctx.answerCbQuery();
   }
 
   private handleEchoCommand(ctx) {
@@ -37,6 +62,16 @@ export class TelegrafService {
     const userId = ctx.message?.from?.id;
 
     if (!content || !userId) return;
+
+    if (!this.userStartedConversation.has(userId)) {
+      const inlineKeyboard = Markup.inlineKeyboard([
+        Markup.button.callback('Start conversation', 'start_conversation'),
+        Markup.button.callback('Conversation archive', 'conversation_archive'),
+      ]);
+
+      ctx.reply('Please select an action to proceed.', inlineKeyboard);
+      return;
+    }
 
     const userConversationHistory =
       await this.conversationHistoryService.getOrCreateConversationHistory(
