@@ -119,7 +119,14 @@ export class TelegrafService {
       )
       .join('\n');
 
-    ctx.reply(`Here is your conversation archive:\n\n${formattedHistory}`);
+    const inlineKeyboard = Markup.inlineKeyboard([
+      Markup.button.callback('Start conversation', 'start_conversation'),
+    ]);
+
+    ctx.reply(
+      `Here is your conversation archive:\n\n${formattedHistory}`,
+      inlineKeyboard,
+    );
   }
 
   getBotInstance(): Telegraf<Context> {
