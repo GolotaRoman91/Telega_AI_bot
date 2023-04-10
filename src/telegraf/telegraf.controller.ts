@@ -1,13 +1,7 @@
-import { Controller, Post, Req } from '@nestjs/common';
-import { Telegraf } from 'telegraf';
-import { Request } from 'express';
+import { Controller } from '@nestjs/common';
+import { TelegrafService } from './telegraf.service';
 
 @Controller('telegraf')
 export class TelegrafController {
-  constructor(private readonly telegrafService: Telegraf) {}
-
-  @Post('webhook')
-  async handleWebhook(@Req() request: Request): Promise<void> {
-    await this.telegrafService.handleUpdate(request.body);
-  }
+  constructor(private readonly telegrafService: TelegrafService) {}
 }
