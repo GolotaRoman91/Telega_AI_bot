@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { ConversationHistory } from './conversation-history.model';
+import { ConversationHistory } from '../models/conversation-history.model';
 
 @Injectable()
 export class ConversationHistoryService {

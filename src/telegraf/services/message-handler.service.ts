@@ -5,7 +5,7 @@ import { ConversationHistoryService } from './conversation-history.service';
 import {
   endConversationKeyboard,
   startConversationKeyboard,
-} from './markup-utils';
+} from '../markup-utils';
 import { Message } from 'telegraf/typings/core/types/typegram';
 
 @Injectable()

@@ -1,13 +1,13 @@
 import { Module } from '@nestjs/common';
-import { TelegrafService } from './telegraf.service';
+import { TelegrafService } from './services/telegraf.service';
 import { TelegrafController } from './telegraf.controller';
 import { Telegraf } from 'telegraf';
-import { OpenAiService } from './openai.service';
-import { ConversationHistoryService } from './conversation-history.service';
-import { CallbackQueryService } from './callback-query.service';
+import { OpenAiService } from './services/openai.service';
+import { ConversationHistoryService } from './services/conversation-history.service';
+import { CallbackQueryService } from './services/callback-query.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { ConversationHistory } from './conversation-history.model';
-import { MessageHandlerService } from './message-handler.service';
+import { ConversationHistory } from './models/conversation-history.model';
+import { MessageHandlerService } from './services/message-handler.service';
 
 @Module({
   imports: [SequelizeModule.forFeature([ConversationHistory])],

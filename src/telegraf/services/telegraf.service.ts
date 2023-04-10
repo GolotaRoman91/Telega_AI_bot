@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Telegraf, Context } from 'telegraf';
 import { CallbackQueryService } from './callback-query.service';
 import { MessageHandlerService } from './message-handler.service';
-import { startConversationKeyboard } from './markup-utils';
+import { startConversationKeyboard } from '../markup-utils';
 
 @Injectable()
 export class TelegrafService {

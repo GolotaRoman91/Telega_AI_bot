@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { Context } from 'telegraf';
 import { ConversationHistoryService } from './conversation-history.service';
-import { startConversationKeyboard } from './markup-utils';
+import { startConversationKeyboard } from '../markup-utils';
 
 @Injectable()
 export class CallbackQueryService {
