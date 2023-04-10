@@ -1,38 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ConversationHistory } from './conversation-history.model';
-import { ArchivedDialog } from './archived-dialog.model';
 
 @Injectable()
 export class ConversationHistoryService {
   constructor(
     @InjectModel(ConversationHistory)
     private conversationHistoryModel: typeof ConversationHistory,
-    @InjectModel(ArchivedDialog)
-    private archivedDialogModel: typeof ArchivedDialog,
   ) {}
-
-  async archiveConversationHistory(
-    userId: number,
-    conversationHistory: Array<{ role: string; content: string }>,
-  ) {
-    try {
-      await this.archivedDialogModel.create({
-        userId,
-        history: this.serializeHistory(conversationHistory),
-        archivedAt: new Date(),
-      });
-
-      // Optionally, clear the conversation history after archiving
-      await this.conversationHistoryModel.update(
-        { history: this.serializeHistory([]) },
-        { where: { userId } },
-      );
-    } catch (error) {
-      console.error('Error in archiveConversationHistory:', error);
-      throw error;
-    }
-  }
 
   async getOrCreateConversationHistory(userId: number) {
     try {
@@ -74,3 +49,4 @@ export class ConversationHistoryService {
     return JSON.parse(serializedHistory);
   }
 }
+
