@@ -46,7 +46,17 @@ export class TelegrafService {
         'You have started a new conversation. You can now send messages.',
       );
     } else if (data === 'conversation_archive') {
-      // Handle displaying conversation archive
+      this.displayConversationArchive(ctx, userId);
+    } else if (data === 'end_conversation') {
+      this.userStartedConversation.delete(userId);
+      const inlineKeyboard = Markup.inlineKeyboard([
+        Markup.button.callback('Start conversation', 'start_conversation'),
+        Markup.button.callback('Conversation archive', 'conversation_archive'),
+      ]);
+      ctx.reply(
+        'Conversation has ended. Please select an action to proceed.',
+        inlineKeyboard,
+      );
     }
 
     ctx.answerCbQuery();
@@ -84,11 +94,32 @@ export class TelegrafService {
     );
     userConversationHistory.push({ role: 'assistant', content: response });
 
-    await ctx.reply(response);
+    const endConversationInlineKeyboard = Markup.inlineKeyboard([
+      Markup.button.callback('End conversation', 'end_conversation'),
+    ]);
+
+    await ctx.reply(response, endConversationInlineKeyboard);
     await this.conversationHistoryService.updateConversationHistory(
       userId,
       userConversationHistory,
     );
+  }
+
+  private async displayConversationArchive(ctx, userId) {
+    const userConversationHistory =
+      await this.conversationHistoryService.getOrCreateConversationHistory(
+        userId,
+      );
+    const formattedHistory = userConversationHistory
+      .map(
+        (message) =>
+          `${message.role === 'user' ? 'You' : 'AI Assistant'}: ${
+            message.content
+          }`,
+      )
+      .join('\n');
+
+    ctx.reply(`Here is your conversation archive:\n\n${formattedHistory}`);
   }
 
   getBotInstance(): Telegraf<Context> {
