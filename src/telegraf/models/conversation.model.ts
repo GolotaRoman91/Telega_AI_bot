@@ -6,7 +6,7 @@ import {
   ForeignKey,
   BelongsTo,
 } from 'sequelize-typescript';
-import { ConversationHistory } from './conversation-history.model';
+import { Users } from './Users.model';
 
 @Table
 export class Conversation extends Model {
@@ -17,15 +17,15 @@ export class Conversation extends Model {
   })
   id: number;
 
-  @ForeignKey(() => ConversationHistory)
+  @ForeignKey(() => Users)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
   userId: number;
 
-  @BelongsTo(() => ConversationHistory)
-  user: ConversationHistory;
+  @BelongsTo(() => Users)
+  user: Users;
 
   @Column({
     type: DataType.TEXT,
@@ -33,13 +33,13 @@ export class Conversation extends Model {
   })
   history: string;
 
-  @ForeignKey(() => ConversationHistory)
+  @ForeignKey(() => Users)
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
   conversationHistoryId: number;
 
-  @BelongsTo(() => ConversationHistory)
-  conversationHistory: ConversationHistory;
+  @BelongsTo(() => Users)
+  conversationHistory: Users;
 }

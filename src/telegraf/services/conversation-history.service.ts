@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { ConversationHistory } from '../models/conversation-history.model';
+import { Users } from '../models/Users.model';
 
 @Injectable()
 export class ConversationHistoryService {
   constructor(
-    @InjectModel(ConversationHistory)
-    private conversationHistoryModel: typeof ConversationHistory,
+    @InjectModel(Users)
+    private conversationHistoryModel: typeof Users,
   ) {}
 
   async getOrCreateConversationHistory(userId: number) {

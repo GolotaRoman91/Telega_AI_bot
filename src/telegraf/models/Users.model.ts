@@ -1,7 +1,7 @@
 import { Column, Model, Table, DataType } from 'sequelize-typescript';
 
 @Table
-export class ConversationHistory extends Model {
+export class Users extends Model {
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,
