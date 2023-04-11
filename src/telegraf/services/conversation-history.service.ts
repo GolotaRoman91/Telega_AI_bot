@@ -79,6 +79,7 @@ export class ConversationHistoryService {
     const conversation = await this.conversationModel.create({
       userId,
       history,
+      conversationHistoryId: conversationHistory.id, // Add this line to provide conversationHistoryId
     });
     return conversation;
   }
