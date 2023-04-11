@@ -6,11 +6,12 @@ import { OpenAiService } from './services/openai.service';
 import { ConversationHistoryService } from './services/conversation-history.service';
 import { CallbackQueryService } from './services/callback-query.service';
 import { SequelizeModule } from '@nestjs/sequelize';
-import { ConversationHistory } from './models/conversation-history.model';
 import { MessageHandlerService } from './services/message-handler.service';
+import { ConversationHistory } from './models/conversation-history.model';
+import { Conversation } from './models/conversation.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([ConversationHistory])],
+  imports: [SequelizeModule.forFeature([ConversationHistory, Conversation])],
   providers: [
     TelegrafService,
     OpenAiService,

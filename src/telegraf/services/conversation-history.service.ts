@@ -7,9 +7,9 @@ import { Conversation } from '../models/conversation.model';
 export class ConversationHistoryService {
   constructor(
     @InjectModel(ConversationHistory)
-    private conversationHistoryModel: typeof ConversationHistory,
+    private readonly conversationHistoryModel: typeof ConversationHistory,
     @InjectModel(Conversation)
-    private conversationModel: typeof Conversation,
+    private readonly conversationModel: typeof Conversation,
   ) {}
 
   async getOrCreateConversationHistory(userId: number) {
