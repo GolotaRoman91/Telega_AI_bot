@@ -49,4 +49,3 @@ export class ConversationHistoryService {
     return JSON.parse(serializedHistory);
   }
 }
-
