@@ -1,4 +1,5 @@
-import { Column, Model, Table, DataType } from 'sequelize-typescript';
+import { Column, Model, Table, DataType, HasMany } from 'sequelize-typescript';
+import { Conversation } from './conversation.model';
 
 @Table
 export class Users extends Model {
@@ -17,8 +18,12 @@ export class Users extends Model {
   userId: number;
 
   @Column({
-    type: DataType.TEXT,
+    type: DataType.ARRAY(DataType.INTEGER),
     allowNull: false,
+    defaultValue: [],
   })
-  history: string;
+  history: number[];
+
+  @HasMany(() => Conversation)
+  conversations: Conversation[];
 }

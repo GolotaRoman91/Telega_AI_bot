@@ -36,10 +36,9 @@ export class MessageHandlerService {
       return;
     }
 
+    const user = await this.conversationHistoryService.getOrCreateUser(userId);
     const userConversationHistory =
-      await this.conversationHistoryService.getOrCreateConversationHistory(
-        userId,
-      );
+      await this.conversationHistoryService.getConversationHistory(user);
 
     userConversationHistory.push({ role: 'user', content });
     const response = await this.openAiService.getResponse(
@@ -47,10 +46,14 @@ export class MessageHandlerService {
     );
     userConversationHistory.push({ role: 'assistant', content: response });
 
-    await ctx.reply(response, endConversationKeyboard);
-    await this.conversationHistoryService.updateConversationHistory(
-      userId,
-      userConversationHistory,
-    );
+    // Store the conversation ID when a new conversation is created
+    const { conversation, conversationId } =
+      await this.conversationHistoryService.createConversation(
+        user,
+        'assistant',
+        response,
+      );
+
+    ctx.reply(response, endConversationKeyboard);
   }
 }

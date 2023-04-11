@@ -32,14 +32,4 @@ export class Conversation extends Model {
     allowNull: false,
   })
   history: string;
-
-  @ForeignKey(() => Users)
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-  })
-  conversationHistoryId: number;
-
-  @BelongsTo(() => Users)
-  conversationHistory: Users;
 }

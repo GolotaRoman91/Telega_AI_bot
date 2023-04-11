@@ -8,9 +8,10 @@ import { CallbackQueryService } from './services/callback-query.service';
 import { SequelizeModule } from '@nestjs/sequelize';
 import { Users } from './models/Users.model';
 import { MessageHandlerService } from './services/message-handler.service';
+import { Conversation } from './models/conversation.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([Users])],
+  imports: [SequelizeModule.forFeature([Users, Conversation])],
   providers: [
     TelegrafService,
     OpenAiService,
