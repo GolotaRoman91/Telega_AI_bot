@@ -7,7 +7,10 @@ import { startConversationKeyboard } from '../markup-utils';
 export class CallbackQueryService {
   constructor(private conversationHistoryService: ConversationHistoryService) {}
 
-  handleCallbackQuery(ctx: Context, userStartedConversation: Set<number>) {
+  async handleCallbackQuery(
+    ctx: Context,
+    userStartedConversation: Set<number>,
+  ) {
     if ('data' in ctx.callbackQuery) {
       const userId = ctx.callbackQuery.from.id;
       const data = ctx.callbackQuery.data;
@@ -21,6 +24,12 @@ export class CallbackQueryService {
         this.displayConversationArchive(ctx, userId);
       } else if (data === 'end_conversation') {
         userStartedConversation.delete(userId);
+        const currentConversation =
+          await this.conversationHistoryService.createNewConversation(userId);
+        await this.conversationHistoryService.saveConversation(
+          userId,
+          currentConversation,
+        );
         ctx.reply(
           'Conversation has ended. Please select an action to proceed.',
           startConversationKeyboard,
@@ -32,19 +41,23 @@ export class CallbackQueryService {
   }
 
   async displayConversationArchive(ctx: Context, userId: number) {
-    const userConversationHistory =
-      await this.conversationHistoryService.getOrCreateConversationHistory(
-        userId,
-      );
+    const userConversations =
+      await this.conversationHistoryService.getConversationsByUserId(userId);
 
-    const formattedHistory = userConversationHistory
+    const formattedHistory = userConversations
       .map(
-        (message) =>
-          `${message.role === 'user' ? 'You' : 'AI Assistant'}: ${
-            message.content
-          }`,
+        (conversation, index) =>
+          `Conversation ${index + 1}:\n` +
+          conversation
+            .map(
+              (message) =>
+                `${message.role === 'user' ? 'You' : 'AI Assistant'}: ${
+                  message.content
+                }`,
+            )
+            .join('\n'),
       )
-      .join('\n');
+      .join('\n\n');
 
     ctx.reply(
       `Here is your conversation archive:\n\n${formattedHistory}`,

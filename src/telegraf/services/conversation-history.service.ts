@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { ConversationHistory } from '../models/conversation-history.model';
+import { Conversation } from '../models/conversation.model';
 
 @Injectable()
 export class ConversationHistoryService {
   constructor(
     @InjectModel(ConversationHistory)
     private conversationHistoryModel: typeof ConversationHistory,
+    @InjectModel(Conversation)
+    private conversationModel: typeof Conversation,
   ) {}
 
   async getOrCreateConversationHistory(userId: number) {
@@ -47,5 +50,51 @@ export class ConversationHistoryService {
 
   private deserializeHistory(serializedHistory: string) {
     return JSON.parse(serializedHistory);
+  }
+
+  async createNewConversation(userId: number) {
+    try {
+      const conversation = await this.conversationModel.create({
+        userId,
+        history: this.serializeHistory([
+          { role: 'system', content: 'You are a helpful assistant.' },
+        ]),
+      });
+
+      return this.deserializeHistory(conversation.history);
+    } catch (error) {
+      console.error('Error in createNewConversation:', error);
+      throw error;
+    }
+  }
+
+  async saveConversation(
+    userId: number,
+    conversation: Array<{ role: string; content: string }>,
+  ) {
+    try {
+      await this.conversationModel.create({
+        userId,
+        history: this.serializeHistory(conversation),
+      });
+    } catch (error) {
+      console.error('Error in saveConversation:', error);
+      throw error;
+    }
+  }
+
+  async getConversationsByUserId(userId: number) {
+    try {
+      const conversations = await this.conversationModel.findAll({
+        where: { userId },
+      });
+
+      return conversations.map((conversation) =>
+        this.deserializeHistory(conversation.history),
+      );
+    } catch (error) {
+      console.error('Error in getConversationsByUserId:', error);
+      throw error;
+    }
   }
 }
