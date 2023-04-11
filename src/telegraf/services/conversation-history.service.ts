@@ -44,28 +44,43 @@ export class ConversationHistoryService {
     );
   }
 
-  private serializeHistory(history: Array<{ role: string; content: string }>) {
+  serializeHistory(history: Array<{ role: string; content: string }>) {
     return JSON.stringify(history);
   }
 
-  private deserializeHistory(serializedHistory: string) {
+  deserializeHistory(serializedHistory: string) {
     return JSON.parse(serializedHistory);
   }
 
-  async createNewConversation(userId: number) {
-    try {
-      const conversation = await this.conversationModel.create({
-        userId,
-        history: this.serializeHistory([
-          { role: 'system', content: 'You are a helpful assistant.' },
-        ]),
-      });
+  async createNewConversation(
+    userId: number,
+    history: string,
+  ): Promise<Conversation> {
+    // First, check if the user has a conversation history
+    let conversationHistory = await this.conversationHistoryModel.findOne({
+      where: { userId },
+    });
 
-      return this.deserializeHistory(conversation.history);
-    } catch (error) {
-      console.error('Error in createNewConversation:', error);
-      throw error;
+    // If not, create a new conversation history entry for the user
+    if (!conversationHistory) {
+      conversationHistory = await this.conversationHistoryModel.create({
+        userId,
+        history,
+      });
+    } else {
+      // If the user has a conversation history, update it
+      await this.conversationHistoryModel.update(
+        { history },
+        { where: { userId } },
+      );
     }
+
+    // Then create a new conversation entry for the user
+    const conversation = await this.conversationModel.create({
+      userId,
+      history,
+    });
+    return conversation;
   }
 
   async saveConversation(

@@ -24,11 +24,21 @@ export class CallbackQueryService {
         this.displayConversationArchive(ctx, userId);
       } else if (data === 'end_conversation') {
         userStartedConversation.delete(userId);
+        const emptyConversationHistory = [];
+        const serializedConversationHistory =
+          this.conversationHistoryService.serializeHistory(
+            emptyConversationHistory,
+          );
         const currentConversation =
-          await this.conversationHistoryService.createNewConversation(userId);
+          await this.conversationHistoryService.createNewConversation(
+            userId,
+            serializedConversationHistory,
+          );
         await this.conversationHistoryService.saveConversation(
           userId,
-          currentConversation,
+          this.conversationHistoryService.deserializeHistory(
+            currentConversation.history,
+          ),
         );
         ctx.reply(
           'Conversation has ended. Please select an action to proceed.',
