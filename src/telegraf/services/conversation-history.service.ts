@@ -1,26 +1,25 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { ConversationHistory } from '../models/conversation-history.model';
+import { User } from '../models/User.model';
 
 @Injectable()
 export class ConversationHistoryService {
   constructor(
-    @InjectModel(ConversationHistory)
-    private conversationHistoryModel: typeof ConversationHistory,
+    @InjectModel(User)
+    private UserModel: typeof User,
   ) {}
 
   async getOrCreateConversationHistory(userId: number) {
     try {
-      const [conversationHistory, created] =
-        await this.conversationHistoryModel.findOrCreate({
-          where: { userId },
-          defaults: {
-            userId,
-            history: this.serializeHistory([
-              { role: 'system', content: 'You are a helpful assistant.' },
-            ]),
-          },
-        });
+      const [conversationHistory, created] = await this.UserModel.findOrCreate({
+        where: { userId },
+        defaults: {
+          userId,
+          history: this.serializeHistory([
+            { role: 'system', content: 'You are a helpful assistant.' },
+          ]),
+        },
+      });
 
       return created
         ? this.deserializeHistory(conversationHistory.history)
@@ -35,7 +34,7 @@ export class ConversationHistoryService {
     userId: number,
     updatedHistory: Array<{ role: string; content: string }>,
   ) {
-    await this.conversationHistoryModel.update(
+    await this.UserModel.update(
       { history: this.serializeHistory(updatedHistory) },
       { where: { userId } },
     );
