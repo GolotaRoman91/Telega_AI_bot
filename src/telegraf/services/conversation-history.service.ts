@@ -11,7 +11,7 @@ export class ConversationHistoryService {
 
   async getOrCreateConversationHistory(userId: number) {
     try {
-      const [conversationHistory, created] = await this.UserModel.findOrCreate({
+      const [conversationHistory] = await this.UserModel.findOrCreate({
         where: { userId },
         defaults: {
           userId,
@@ -21,9 +21,7 @@ export class ConversationHistoryService {
         },
       });
 
-      return created
-        ? this.deserializeHistory(conversationHistory.history)
-        : this.deserializeHistory(conversationHistory.history);
+      return this.deserializeHistory(conversationHistory.history);
     } catch (error) {
       console.error('Error in getOrCreateConversationHistory:', error);
       throw error;

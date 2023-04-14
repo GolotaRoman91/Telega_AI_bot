@@ -21,12 +21,9 @@ export class MessageHandlerService {
     userStartedConversation: Set<number>,
   ) {
     const message = ctx.message as Message.TextMessage;
-
-    if (!message) return;
-
     const content = message.text;
 
-    if (!content) return;
+    if (!message || !content) return;
 
     if (!userStartedConversation.has(userId)) {
       ctx.reply(
