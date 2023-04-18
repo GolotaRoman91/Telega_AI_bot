@@ -3,20 +3,15 @@ import { TelegrafService } from './services/telegraf.service';
 import { TelegrafController } from './telegraf.controller';
 import { Telegraf } from 'telegraf';
 import { OpenAiService } from './services/openai.service';
-import { ConversationHistoryService } from './services/conversation-history.service';
-import { CallbackQueryService } from './services/callback-query.service';
+
 import { SequelizeModule } from '@nestjs/sequelize';
-import { ConversationHistory } from './models/conversation-history.model';
-import { MessageHandlerService } from './services/message-handler.service';
+import { User } from './models/user.model';
 
 @Module({
-  imports: [SequelizeModule.forFeature([ConversationHistory])],
+  imports: [SequelizeModule.forFeature([User])],
   providers: [
     TelegrafService,
     OpenAiService,
-    ConversationHistoryService,
-    CallbackQueryService,
-    MessageHandlerService,
     {
       provide: Telegraf,
       useFactory: (telegrafService: TelegrafService) =>
