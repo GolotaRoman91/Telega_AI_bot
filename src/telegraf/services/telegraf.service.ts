@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Telegraf, Context } from 'telegraf';
 import { CallbackQueryService } from './callback-query.service';
 import { MessageHandlerService } from './message-handler.service';
-import { startConversationKeyboard } from '../markup-utils';
+import { startConversationAfterArchiveKeyboard } from '../markup-utils';
 
 @Injectable()
 export class TelegrafService {
@@ -29,7 +29,7 @@ export class TelegrafService {
   private handleStartCommand(ctx) {
     const welcomeMessage = `Welcome to the AI Assistant bot! 😊 I'm here to help you with any questions or concerns you may have. Feel free to ask me anything, and I'll do my best to assist you!`;
 
-    ctx.reply(welcomeMessage, startConversationKeyboard);
+    ctx.reply(welcomeMessage, startConversationAfterArchiveKeyboard);
   }
 
   private handleCallbackQuery(ctx) {
