@@ -9,6 +9,7 @@ import { Conversation } from './models/conversation.model';
 import { Message } from './models/message.model';
 import { ConversationService } from './services/conversation.service';
 import { MessageService } from './services/message.service';
+import { UserService } from './services/user.service';
 
 @Module({
   imports: [SequelizeModule.forFeature([User, Conversation, Message])],
@@ -17,6 +18,7 @@ import { MessageService } from './services/message.service';
     OpenAiService,
     ConversationService,
     MessageService,
+    UserService,
     {
       provide: Telegraf,
       useFactory: (telegrafService: TelegrafService) =>

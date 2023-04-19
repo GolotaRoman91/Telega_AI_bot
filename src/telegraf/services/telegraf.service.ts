@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Telegraf, Context } from 'telegraf';
 import { ConversationService } from './conversation.service';
 import { MessageService } from './message.service';
-import { User } from '../models/user.model';
 import { startConversationKeyboard } from '../markup-utils';
+import { UserService } from './user.service';
 
 @Injectable()
 export class TelegrafService {
@@ -12,6 +12,7 @@ export class TelegrafService {
   constructor(
     private conversationService: ConversationService,
     private messageService: MessageService,
+    private userService: UserService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
     this.registerHandlers();
@@ -25,16 +26,7 @@ export class TelegrafService {
   private async handleStartCommand(ctx: Context) {
     const telegramId = ctx.from.id;
 
-    const created = await User.findOrCreate({
-      where: { telegramId },
-      defaults: { telegramId },
-    });
-
-    if (created) {
-      console.log(`New user created with telegramId: ${telegramId}`);
-    } else {
-      console.log(`User with telegramId: ${telegramId} already exists`);
-    }
+    await this.userService.findOrCreateUser(telegramId);
 
     const welcomeMessage = `Welcome to the AI Assistant bot! 😊 I'm here to help you with any questions or concerns you may have. Feel free to ask me anything, and I'll do my best to assist you!`;
 
