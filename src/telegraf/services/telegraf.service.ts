@@ -32,7 +32,7 @@ export class TelegrafService {
     ctx.reply(welcomeMessage, startConversationKeyboard);
   }
 
-  private handleCallbackQuery(ctx) {
+  private handleCallbackQuery(ctx: Context) {
     this.CallbackQueryService.handleCallbackQuery(ctx);
   }
 

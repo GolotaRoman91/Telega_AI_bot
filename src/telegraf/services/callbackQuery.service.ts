@@ -1,6 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Context } from 'telegraf';
-import { startConversationKeyboard } from '../markup-utils';
+import {
+  endConversationKeyboard,
+  startConversationKeyboard,
+} from '../markup-utils';
 
 @Injectable()
 export class CallbackQueryService {
@@ -11,6 +14,7 @@ export class CallbackQueryService {
       if (data === 'start_conversation') {
         ctx.reply(
           'You have started a new conversation. You can now send messages.',
+          endConversationKeyboard,
         );
       } else if (data === 'end_conversation') {
         ctx.reply(
