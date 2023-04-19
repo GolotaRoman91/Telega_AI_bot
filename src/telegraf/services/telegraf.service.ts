@@ -1,17 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { Telegraf, Context } from 'telegraf';
-import { ConversationService } from './conversation.service';
-import { MessageService } from './message.service';
 import { startConversationKeyboard } from '../markup-utils';
 import { UserService } from './user.service';
+import { CallbackQueryService } from './callbackQuery.service';
 
 @Injectable()
 export class TelegrafService {
   private bot: Telegraf<Context>;
 
   constructor(
-    private conversationService: ConversationService,
-    private messageService: MessageService,
+    private CallbackQueryService: CallbackQueryService,
     private userService: UserService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
@@ -21,6 +19,7 @@ export class TelegrafService {
 
   private registerHandlers() {
     this.bot.command('start', (ctx) => this.handleStartCommand(ctx));
+    this.bot.on('callback_query', (ctx) => this.handleCallbackQuery(ctx));
   }
 
   private async handleStartCommand(ctx: Context) {
@@ -31,6 +30,10 @@ export class TelegrafService {
     const welcomeMessage = `Welcome to the AI Assistant bot! 😊 I'm here to help you with any questions or concerns you may have. Feel free to ask me anything, and I'll do my best to assist you!`;
 
     ctx.reply(welcomeMessage, startConversationKeyboard);
+  }
+
+  private handleCallbackQuery(ctx) {
+    this.CallbackQueryService.handleCallbackQuery(ctx);
   }
 
   getBotInstance(): Telegraf<Context> {

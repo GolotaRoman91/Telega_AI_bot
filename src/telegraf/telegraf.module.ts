@@ -10,6 +10,7 @@ import { Message } from './models/message.model';
 import { ConversationService } from './services/conversation.service';
 import { MessageService } from './services/message.service';
 import { UserService } from './services/user.service';
+import { CallbackQueryService } from './services/callbackQuery.service';
 
 @Module({
   imports: [SequelizeModule.forFeature([User, Conversation, Message])],
@@ -19,6 +20,7 @@ import { UserService } from './services/user.service';
     ConversationService,
     MessageService,
     UserService,
+    CallbackQueryService,
     {
       provide: Telegraf,
       useFactory: (telegrafService: TelegrafService) =>
