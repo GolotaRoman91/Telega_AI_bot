@@ -1,24 +1,24 @@
-import { Column, Model, Table, DataType } from 'sequelize-typescript';
+import {
+  Table,
+  Column,
+  Model,
+  DataType,
+  PrimaryKey,
+  AutoIncrement,
+  HasMany,
+} from 'sequelize-typescript';
+import { Conversation } from './conversation.model';
 
-@Table
+@Table({ tableName: 'users' })
 export class User extends Model {
-  @Column({
-    type: DataType.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  })
+  @PrimaryKey
+  @AutoIncrement
+  @Column(DataType.INTEGER)
   id: number;
 
-  @Column({
-    type: DataType.INTEGER,
-    allowNull: false,
-    unique: true,
-  })
-  userId: number;
+  @Column(DataType.INTEGER)
+  telegramId: number;
 
-  @Column({
-    type: DataType.TEXT,
-    allowNull: false,
-  })
-  history: string;
+  @HasMany(() => Conversation)
+  conversations: Conversation[];
 }
