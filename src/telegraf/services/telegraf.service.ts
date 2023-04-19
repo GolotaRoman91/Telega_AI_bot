@@ -10,7 +10,7 @@ export class TelegrafService {
   private userStartedConversation: Set<number>;
 
   constructor(
-    private CallbackQueryService: CallbackQueryService,
+    private callbackQueryService: CallbackQueryService,
     private userService: UserService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
@@ -35,7 +35,7 @@ export class TelegrafService {
   }
 
   private handleCallbackQuery(ctx: Context) {
-    this.CallbackQueryService.handleCallbackQuery(
+    this.callbackQueryService.handleCallbackQuery(
       ctx,
       this.userStartedConversation,
     );
