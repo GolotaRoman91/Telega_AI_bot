@@ -3,6 +3,7 @@ import { Telegraf, Context } from 'telegraf';
 import { startConversationKeyboard } from '../markup-utils';
 import { UserService } from './user.service';
 import { CallbackQueryService } from './callbackQuery.service';
+import { MessageService } from './message.service';
 
 @Injectable()
 export class TelegrafService {
@@ -12,6 +13,7 @@ export class TelegrafService {
   constructor(
     private callbackQueryService: CallbackQueryService,
     private userService: UserService,
+    private messageHandlerService: MessageService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
     this.registerHandlers();
@@ -22,6 +24,7 @@ export class TelegrafService {
   private registerHandlers() {
     this.bot.command('start', (ctx) => this.handleStartCommand(ctx));
     this.bot.on('callback_query', (ctx) => this.handleCallbackQuery(ctx));
+    this.bot.on('text', async (ctx) => await this.handleTextMessage(ctx));
   }
 
   private async handleStartCommand(ctx: Context) {
@@ -39,6 +42,17 @@ export class TelegrafService {
       ctx,
       this.userStartedConversation,
     );
+  }
+
+  private async handleTextMessage(ctx: Context) {
+    const userId = ctx.message?.from?.id;
+    if (userId) {
+      this.messageHandlerService.handleTextMessage(
+        ctx,
+        userId,
+        this.userStartedConversation,
+      );
+    }
   }
 
   getBotInstance(): Telegraf<Context> {

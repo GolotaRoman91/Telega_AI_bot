@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { Message } from '../models/message.model';
+import { startConversationKeyboard } from '../markup-utils';
 
 @Injectable()
 export class MessageService {
@@ -17,5 +18,15 @@ export class MessageService {
       sender,
       timestamp: new Date(),
     });
+  }
+
+  async handleTextMessage(ctx, userId, userStartedConversation) {
+    if (!userStartedConversation.has(userId)) {
+      ctx.reply(
+        'Please select an action to proceed.',
+        startConversationKeyboard,
+      );
+      return;
+    }
   }
 }
