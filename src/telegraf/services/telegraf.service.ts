@@ -1,9 +1,11 @@
+import { ConversationService } from './conversation.service';
 import { Injectable } from '@nestjs/common';
 import { Telegraf, Context } from 'telegraf';
 import { startConversationKeyboard } from '../markup-utils';
 import { UserService } from './user.service';
 import { CallbackQueryService } from './callbackQuery.service';
 import { MessageService } from './message.service';
+import { Message } from 'telegraf/typings/core/types/typegram';
 
 @Injectable()
 export class TelegrafService {
@@ -14,6 +16,7 @@ export class TelegrafService {
     private callbackQueryService: CallbackQueryService,
     private userService: UserService,
     private messageHandlerService: MessageService,
+    private conversationService: ConversationService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
     this.registerHandlers();
@@ -46,12 +49,25 @@ export class TelegrafService {
 
   private async handleTextMessage(ctx: Context) {
     const userId = ctx.message?.from?.id;
+    const message = ctx.message as Message.TextMessage;
+
     if (userId) {
-      this.messageHandlerService.handleTextMessage(
-        ctx,
+      const conversationId = await this.conversationService.getConversationId(
         userId,
-        this.userStartedConversation,
       );
+
+      if (conversationId !== null) {
+        this.messageHandlerService.handleTextMessage(
+          ctx,
+          userId,
+          this.userStartedConversation,
+        );
+
+        this.messageHandlerService.createUserMessage(
+          conversationId,
+          message.text,
+        );
+      }
     }
   }
 

@@ -14,10 +14,6 @@ export class ConversationService {
   async startConversation(telegramId: number): Promise<Conversation> {
     const user = await this.userModel.findOne({ where: { telegramId } });
 
-    // if (!user) {
-    //   user = await this.userModel.create({ telegramId });
-    // }
-
     return await this.conversationModel.create({ userId: user.id });
   }
 
@@ -25,7 +21,24 @@ export class ConversationService {
     return await this.userModel.findOne({ where: { telegramId } });
   }
 
-  //   async endConversation(conversationId: number): Promise<void> {}
+  async getConversationId(telegramId: number): Promise<number | null> {
+    const user = await this.userModel.findOne({ where: { telegramId } });
+
+    if (!user) {
+      return null;
+    }
+
+    const conversation = await this.conversationModel.findOne({
+      where: { userId: user.id },
+      order: [['conversationId', 'DESC']],
+    });
+
+    if (!conversation) {
+      return null;
+    }
+
+    return conversation.conversationId;
+  }
 
   async getConversationHistory(conversationId: number): Promise<Message[]> {
     const conversation = await this.conversationModel.findByPk(conversationId, {

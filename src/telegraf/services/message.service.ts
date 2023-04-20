@@ -7,20 +7,23 @@ import { startConversationKeyboard } from '../markup-utils';
 export class MessageService {
   constructor(@InjectModel(Message) private messageModel: typeof Message) {}
 
-  async createMessage(
+  async createUserMessage(
     conversationId: number,
     content: string,
-    sender: 'user' | 'bot',
   ): Promise<Message> {
-    return await this.messageModel.create({
+    const message = new Message({
       conversationId,
       content,
-      sender,
+      sender: 'user',
       timestamp: new Date(),
     });
+
+    await message.save();
+    return message;
   }
 
   async handleTextMessage(ctx, userId, userStartedConversation) {
+    console.log(ctx);
     if (!userStartedConversation.has(userId)) {
       ctx.reply(
         'Please select an action to proceed.',

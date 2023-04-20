@@ -17,7 +17,7 @@ export class Conversation extends Model {
   @PrimaryKey
   @AutoIncrement
   @Column(DataType.INTEGER)
-  id: number;
+  conversationId: number;
 
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
