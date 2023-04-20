@@ -1,3 +1,4 @@
+import { ConversationService } from './conversation.service';
 import { Injectable } from '@nestjs/common';
 import { Context } from 'telegraf';
 import {
@@ -7,6 +8,7 @@ import {
 
 @Injectable()
 export class CallbackQueryService {
+  constructor(private conversationService: ConversationService) {}
   handleCallbackQuery(ctx: Context, userStartedConversation: Set<number>) {
     if ('data' in ctx.callbackQuery) {
       const data = ctx.callbackQuery.data;
@@ -14,6 +16,7 @@ export class CallbackQueryService {
 
       if (data === 'start_conversation') {
         userStartedConversation.add(userId);
+        this.conversationService.startConversation(userId);
         ctx.reply(
           'You have started a new conversation. You can now send messages.',
           endConversationKeyboard,

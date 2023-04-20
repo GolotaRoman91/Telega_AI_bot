@@ -12,11 +12,11 @@ export class ConversationService {
   ) {}
 
   async startConversation(telegramId: number): Promise<Conversation> {
-    let user = await this.userModel.findOne({ where: { telegramId } });
+    const user = await this.userModel.findOne({ where: { telegramId } });
 
-    if (!user) {
-      user = await this.userModel.create({ telegramId });
-    }
+    // if (!user) {
+    //   user = await this.userModel.create({ telegramId });
+    // }
 
     return await this.conversationModel.create({ userId: user.id });
   }
