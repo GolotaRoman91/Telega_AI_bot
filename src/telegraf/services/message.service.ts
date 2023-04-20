@@ -22,6 +22,21 @@ export class MessageService {
     return message;
   }
 
+  async createBotMessage(
+    conversationId: number,
+    content: string,
+  ): Promise<Message> {
+    const message = new Message({
+      conversationId,
+      content,
+      sender: 'bot',
+      timestamp: new Date(),
+    });
+
+    await message.save();
+    return message;
+  }
+
   async handleTextMessage(ctx, userId, userStartedConversation) {
     console.log(ctx);
     if (!userStartedConversation.has(userId)) {

@@ -6,6 +6,7 @@ import { UserService } from './user.service';
 import { CallbackQueryService } from './callbackQuery.service';
 import { MessageService } from './message.service';
 import { Message } from 'telegraf/typings/core/types/typegram';
+import { OpenAiService } from './openai.service';
 
 @Injectable()
 export class TelegrafService {
@@ -17,6 +18,7 @@ export class TelegrafService {
     private userService: UserService,
     private messageHandlerService: MessageService,
     private conversationService: ConversationService,
+    private openAiService: OpenAiService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
     this.registerHandlers();
@@ -63,10 +65,29 @@ export class TelegrafService {
           this.userStartedConversation,
         );
 
-        this.messageHandlerService.createUserMessage(
+        await this.messageHandlerService.createUserMessage(
           conversationId,
           message.text,
         );
+
+        // Get the conversation history
+        const conversationHistory =
+          await this.conversationService.getConversationHistory(conversationId);
+
+        // Format conversation history for OpenAI API
+        const formattedHistory = conversationHistory.map((msg) => ({
+          role: msg.sender,
+          content: msg.content,
+        }));
+
+        // Send conversation history to OpenAI API and get a response
+        const botResponse = await this.openAiService.getResponse(
+          conversationId,
+          formattedHistory,
+        );
+
+        // Send the bot's response to the user
+        ctx.reply(botResponse);
       }
     }
   }
