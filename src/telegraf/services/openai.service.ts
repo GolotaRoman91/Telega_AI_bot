@@ -1,9 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import axios from 'axios';
+import { MessageService } from './message.service';
 
 @Injectable()
 export class OpenAiService {
+  constructor(private messageService: MessageService) {}
   async getResponse(
+    conversationId: number,
     conversationHistory: Array<{ role: string; content: string }>,
   ): Promise<string> {
     try {
@@ -21,6 +24,8 @@ export class OpenAiService {
         },
       );
       const reply = response.data.choices[0].message.content;
+      await this.messageService.createBotMessage(conversationId, reply);
+
       return reply;
     } catch (error) {
       console.error('Error sending request to OpenAI:', error.message);
