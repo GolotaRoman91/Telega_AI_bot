@@ -50,7 +50,6 @@ export class TelegrafService {
 
   private async handleTextMessage(ctx: Context) {
     const userId = ctx.message?.from?.id;
-    // const message = ctx.message as Message.TextMessage;
 
     if (userId) {
       await this.messageHandlerService.processTextMessage(
