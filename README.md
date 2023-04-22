@@ -1,4 +1,4 @@
 Todo:
 
-1. Realize start conversation
-2. Realize end conversation
+1. Code Refactoring
+2. Adding new functionality: displaying the archive of dialogs
