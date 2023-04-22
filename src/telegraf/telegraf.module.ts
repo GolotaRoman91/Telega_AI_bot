@@ -16,11 +16,11 @@ import { CallbackQueryService } from './services/callbackQuery.service';
   imports: [SequelizeModule.forFeature([User, Conversation, Message])],
   providers: [
     TelegrafService,
-    OpenAiService,
-    ConversationService,
-    MessageService,
     UserService,
+    MessageService,
     CallbackQueryService,
+    ConversationService,
+    OpenAiService,
     {
       provide: Telegraf,
       useFactory: (telegrafService: TelegrafService) =>

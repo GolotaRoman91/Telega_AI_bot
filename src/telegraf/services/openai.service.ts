@@ -1,15 +1,24 @@
-import { Injectable } from '@nestjs/common';
+import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import axios from 'axios';
 import { MessageService } from './message.service';
+import { ConversationService } from './conversation.service';
 
 @Injectable()
 export class OpenAiService {
-  constructor(private messageService: MessageService) {}
+  constructor(
+    @Inject(forwardRef(() => MessageService))
+    private messageService: MessageService,
+    private conversationService: ConversationService,
+  ) {}
   async getResponse(
     conversationId: number,
     conversationHistory: Array<{ role: string; content: string }>,
   ): Promise<string> {
     try {
+      console.log('Sending data to OpenAI:', {
+        model: 'gpt-3.5-turbo',
+        messages: conversationHistory,
+      });
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {
