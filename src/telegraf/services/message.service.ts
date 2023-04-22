@@ -29,7 +29,7 @@ export class MessageService {
     const message = new Message({
       conversationId,
       content,
-      sender: 'bot',
+      sender: 'assistant',
       timestamp: new Date(),
     });
 

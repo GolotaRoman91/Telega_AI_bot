@@ -10,6 +10,10 @@ export class OpenAiService {
     conversationHistory: Array<{ role: string; content: string }>,
   ): Promise<string> {
     try {
+      console.log('Sending data to OpenAI:', {
+        model: 'gpt-3.5-turbo',
+        messages: conversationHistory,
+      });
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {

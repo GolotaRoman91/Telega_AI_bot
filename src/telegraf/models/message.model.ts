@@ -24,8 +24,8 @@ export class Message extends Model {
   @Column(DataType.TEXT)
   content: string;
 
-  @Column(DataType.ENUM('user', 'bot'))
-  sender: 'user' | 'bot';
+  @Column(DataType.ENUM('user', 'assistant'))
+  sender: 'user' | 'assistant';
 
   @Column(DataType.DATE)
   timestamp: Date;

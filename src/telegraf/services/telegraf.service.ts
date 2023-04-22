@@ -70,23 +70,19 @@ export class TelegrafService {
           message.text,
         );
 
-        // Get the conversation history
         const conversationHistory =
           await this.conversationService.getConversationHistory(conversationId);
 
-        // Format conversation history for OpenAI API
         const formattedHistory = conversationHistory.map((msg) => ({
           role: msg.sender,
           content: msg.content,
         }));
 
-        // Send conversation history to OpenAI API and get a response
         const botResponse = await this.openAiService.getResponse(
           conversationId,
           formattedHistory,
         );
 
-        // Send the bot's response to the user
         ctx.reply(botResponse);
       }
     }
