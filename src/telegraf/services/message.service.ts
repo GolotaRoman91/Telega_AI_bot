@@ -49,7 +49,11 @@ export class MessageService {
     return message;
   }
 
-  async handleTextMessage(ctx, userId, userStartedConversation) {
+  async handleTextMessage(
+    ctx: Context,
+    userId: number,
+    userStartedConversation: Set<number>,
+  ) {
     console.log(ctx);
     if (!userStartedConversation.has(userId)) {
       ctx.reply(
