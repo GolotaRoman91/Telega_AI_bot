@@ -5,7 +5,6 @@ import { startConversationKeyboard } from '../markup-utils';
 import { UserService } from './user.service';
 import { CallbackQueryService } from './callbackQuery.service';
 import { MessageService } from './message.service';
-import { Message } from 'telegraf/typings/core/types/typegram';
 import { OpenAiService } from './openai.service';
 
 @Injectable()
@@ -51,40 +50,14 @@ export class TelegrafService {
 
   private async handleTextMessage(ctx: Context) {
     const userId = ctx.message?.from?.id;
-    const message = ctx.message as Message.TextMessage;
+    // const message = ctx.message as Message.TextMessage;
 
     if (userId) {
-      const conversationId = await this.conversationService.getConversationId(
+      await this.messageHandlerService.processTextMessage(
+        ctx,
         userId,
+        this.userStartedConversation,
       );
-
-      if (conversationId !== null) {
-        this.messageHandlerService.handleTextMessage(
-          ctx,
-          userId,
-          this.userStartedConversation,
-        );
-
-        await this.messageHandlerService.createUserMessage(
-          conversationId,
-          message.text,
-        );
-
-        const conversationHistory =
-          await this.conversationService.getConversationHistory(conversationId);
-
-        const formattedHistory = conversationHistory.map((msg) => ({
-          role: msg.sender,
-          content: msg.content,
-        }));
-
-        const botResponse = await this.openAiService.getResponse(
-          conversationId,
-          formattedHistory,
-        );
-
-        ctx.reply(botResponse);
-      }
     }
   }
 
