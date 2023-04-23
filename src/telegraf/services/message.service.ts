@@ -49,50 +49,53 @@ export class MessageService {
     return message;
   }
 
-  async handleTextMessage(
-    ctx: Context,
-    userId: number,
-    userStartedConversation: Set<number>,
-  ) {
-    console.log(ctx);
-    if (!userStartedConversation.has(userId)) {
-      ctx.reply(
-        'Please select an action to proceed.',
-        startConversationKeyboard,
-      );
-      return;
-    }
-  }
-
   async processTextMessage(
     ctx: Context,
     userId: number,
     userStartedConversation: Set<number>,
   ) {
-    this.handleTextMessage(ctx, userId, userStartedConversation);
+    if (!this.isUserInConversation(userId, userStartedConversation)) {
+      this.promptUserToStartConversation(ctx);
+      return;
+    }
 
     const conversationId = await this.conversationService.getConversationId(
       userId,
     );
 
     if (conversationId !== null) {
-      const message = ctx.message as TelegrafMessage.TextMessage;
-      await this.createUserMessage(conversationId, message.text);
-
-      const conversationHistory =
-        await this.conversationService.getConversationHistory(conversationId);
-
-      const formattedHistory = conversationHistory.map((msg) => ({
-        role: msg.sender,
-        content: msg.content,
-      }));
-
-      const botResponse = await this.openAiService.getResponse(
-        conversationId,
-        formattedHistory,
-      );
-
-      ctx.reply(botResponse, endConversationKeyboard);
+      await this.processUserMessage(ctx, conversationId);
     }
+  }
+
+  private isUserInConversation(
+    userId: number,
+    userStartedConversation: Set<number>,
+  ): boolean {
+    return userStartedConversation.has(userId);
+  }
+
+  private promptUserToStartConversation(ctx: Context) {
+    ctx.reply('Please select an action to proceed.', startConversationKeyboard);
+  }
+
+  private async processUserMessage(ctx: Context, conversationId: number) {
+    const message = ctx.message as TelegrafMessage.TextMessage;
+    await this.createUserMessage(conversationId, message.text);
+
+    const conversationHistory =
+      await this.conversationService.getConversationHistory(conversationId);
+
+    const formattedHistory = conversationHistory.map((msg) => ({
+      role: msg.sender,
+      content: msg.content,
+    }));
+
+    const botResponse = await this.openAiService.getResponse(
+      conversationId,
+      formattedHistory,
+    );
+
+    ctx.reply(botResponse, endConversationKeyboard);
   }
 }
