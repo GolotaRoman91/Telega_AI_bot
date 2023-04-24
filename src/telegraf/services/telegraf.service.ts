@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Telegraf, Context } from 'telegraf';
-import { startConversationKeyboard } from '../markup-utils';
+import { postConversationKeyboard } from '../markup-utils';
 import { UserService } from './user.service';
 import { CallbackQueryService } from './callbackQuery.service';
 import { MessageService } from './message.service';
@@ -34,7 +34,7 @@ export class TelegrafService {
 
     const welcomeMessage = `Welcome to the AI Assistant bot! 😊 I'm here to help you with any questions or concerns you may have. Feel free to ask me anything, and I'll do my best to assist you!`;
 
-    ctx.reply(welcomeMessage, startConversationKeyboard);
+    ctx.reply(welcomeMessage, postConversationKeyboard);
   }
 
   private handleCallbackQuery(ctx: Context) {
