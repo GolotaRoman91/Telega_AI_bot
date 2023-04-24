@@ -19,6 +19,10 @@ export class UserService {
     return user;
   }
 
+  async findUserByTelegramId(telegramId: number): Promise<User | null> {
+    return await User.findOne({ where: { telegramId } });
+  }
+
   async getConversationsByTelegramId(telegramId: number): Promise<string> {
     const conversations = await Conversation.findAll({
       include: [
