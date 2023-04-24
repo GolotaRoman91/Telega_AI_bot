@@ -13,7 +13,6 @@ export class ConversationService {
 
   async startConversation(telegramId: number): Promise<Conversation> {
     const user = await this.userModel.findOne({ where: { telegramId } });
-
     return await this.conversationModel.create({ userId: user.id });
   }
 

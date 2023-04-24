@@ -6,6 +6,7 @@ import {
   postConversationKeyboard,
 } from '../markup-utils';
 import { Conversation } from '../models/conversation.model';
+import { User } from '../models/user.model';
 
 @Injectable()
 export class CallbackQueryService {
@@ -29,17 +30,25 @@ export class CallbackQueryService {
   }
 
   private async archiveConversationHandler(ctx: Context) {
-    const userId = ctx.callbackQuery.from.id;
+    const telegramId = ctx.callbackQuery.from.id;
 
     try {
-      const conversations = await Conversation.findAll({ where: { userId } });
+      const conversations = await Conversation.findAll({
+        include: [
+          {
+            model: User,
+            where: { telegramId },
+            attributes: [],
+          },
+        ],
+      });
 
       const conversationIds = conversations
         .map((conversation) => conversation.conversationId)
         .join(', ');
 
       ctx.reply(
-        `Here is the list of conversation IDs for user ${userId}: ${conversationIds}`,
+        `Here is the list of conversation IDs for user ${telegramId}: ${conversationIds}`,
       );
     } catch (error) {
       console.error('Error fetching conversations:', error);
