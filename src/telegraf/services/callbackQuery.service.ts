@@ -14,17 +14,18 @@ export class CallbackQueryService {
 
   handleCallbackQuery(ctx: Context, userStartedConversation: Set<number>) {
     if ('data' in ctx.callbackQuery) {
-      const data = ctx.callbackQuery.data;
-      const userId = ctx.callbackQuery.from.id;
+      const { data, from } = ctx.callbackQuery;
+      const userId = from.id;
 
-      if (data === 'start_conversation') {
-        this.startConversationHandler(ctx, userId, userStartedConversation);
-      } else if (data === 'end_conversation') {
-        this.endConversationHandler(ctx, userId, userStartedConversation);
-      } else if (data === 'archive_conversation') {
-        this.archiveConversationHandler(ctx);
-      }
+      const handlers = {
+        start_conversation: () =>
+          this.startConversationHandler(ctx, userId, userStartedConversation),
+        end_conversation: () =>
+          this.endConversationHandler(ctx, userId, userStartedConversation),
+        archive_conversation: () => this.archiveConversationHandler(ctx),
+      };
 
+      handlers[data]?.();
       ctx.answerCbQuery();
     }
   }
