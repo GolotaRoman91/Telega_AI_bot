@@ -3,8 +3,9 @@ import { Injectable } from '@nestjs/common';
 import { Context } from 'telegraf';
 import {
   endConversationKeyboard,
-  startConversationKeyboard,
+  postConversationKeyboard,
 } from '../markup-utils';
+import { Conversation } from '../models/conversation.model';
 
 @Injectable()
 export class CallbackQueryService {
@@ -19,9 +20,32 @@ export class CallbackQueryService {
         this.startConversationHandler(ctx, userId, userStartedConversation);
       } else if (data === 'end_conversation') {
         this.endConversationHandler(ctx, userId, userStartedConversation);
+      } else if (data === 'archive_conversation') {
+        this.archiveConversationHandler(ctx);
       }
 
       ctx.answerCbQuery();
+    }
+  }
+
+  private async archiveConversationHandler(ctx: Context) {
+    const userId = ctx.callbackQuery.from.id;
+
+    try {
+      const conversations = await Conversation.findAll({ where: { userId } });
+
+      const conversationIds = conversations
+        .map((conversation) => conversation.conversationId)
+        .join(', ');
+
+      ctx.reply(
+        `Here is the list of conversation IDs for user ${userId}: ${conversationIds}`,
+      );
+    } catch (error) {
+      console.error('Error fetching conversations:', error);
+      ctx.reply(
+        'An error occurred while fetching your conversations. Please try again later.',
+      );
     }
   }
 
@@ -46,7 +70,7 @@ export class CallbackQueryService {
     userStartedConversation.delete(userId);
     ctx.reply(
       'Conversation has ended. Please select an action to proceed.',
-      startConversationKeyboard,
+      postConversationKeyboard,
     );
   }
 }

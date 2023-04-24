@@ -7,3 +7,8 @@ export const startConversationKeyboard = Markup.inlineKeyboard([
 export const endConversationKeyboard = Markup.inlineKeyboard([
   Markup.button.callback('End conversation', 'end_conversation'),
 ]);
+
+export const postConversationKeyboard = Markup.inlineKeyboard([
+  Markup.button.callback('Start Conversation', 'start_conversation'),
+  Markup.button.callback('Archive Conversation', 'archive_conversation'),
+]);
