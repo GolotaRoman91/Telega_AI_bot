@@ -1,16 +1,18 @@
 import { ConversationService } from './conversation.service';
+import { UserService } from './user.service';
 import { Injectable } from '@nestjs/common';
 import { Context } from 'telegraf';
 import {
   endConversationKeyboard,
   postConversationKeyboard,
 } from '../markup-utils';
-import { Conversation } from '../models/conversation.model';
-import { User } from '../models/user.model';
 
 @Injectable()
 export class CallbackQueryService {
-  constructor(private conversationService: ConversationService) {}
+  constructor(
+    private conversationService: ConversationService,
+    private userService: UserService,
+  ) {}
 
   handleCallbackQuery(ctx: Context, userStartedConversation: Set<number>) {
     if ('data' in ctx.callbackQuery) {
@@ -34,20 +36,8 @@ export class CallbackQueryService {
     const telegramId = ctx.callbackQuery.from.id;
 
     try {
-      const conversations = await Conversation.findAll({
-        include: [
-          {
-            model: User,
-            where: { telegramId },
-            attributes: [],
-          },
-        ],
-      });
-
-      const conversationIds = conversations
-        .map((conversation) => conversation.conversationId)
-        .join(', ');
-
+      const conversationIds =
+        await this.userService.getConversationsByTelegramId(telegramId);
       ctx.reply(
         `Here is the list of conversation IDs for user ${telegramId}: ${conversationIds}`,
       );
