@@ -37,7 +37,7 @@ export class CallbackQueryService {
 
     try {
       const conversationIds =
-        await this.userService.getConversationsByTelegramId(telegramId);
+        await this.conversationService.getConversationsByTelegramId(telegramId);
       ctx.reply(
         `Here is the list of conversation IDs for user ${telegramId}: ${conversationIds}`,
       );

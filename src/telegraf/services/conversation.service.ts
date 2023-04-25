@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Conversation } from '../models/conversation.model';
 import { UserService } from './user.service';
 import { Message } from '../models/message.model';
+import { User } from '../models/user.model';
 
 @Injectable()
 export class ConversationService {
@@ -29,6 +30,22 @@ export class ConversationService {
     }
 
     return conversation.conversationId;
+  }
+
+  async getConversationsByTelegramId(telegramId: number): Promise<string> {
+    const conversations = await Conversation.findAll({
+      include: [
+        {
+          model: User,
+          where: { telegramId },
+          attributes: [],
+        },
+      ],
+    });
+
+    return conversations
+      .map((conversation) => conversation.conversationId)
+      .join(', ');
   }
 
   async getConversationHistory(conversationId: number): Promise<Message[]> {
