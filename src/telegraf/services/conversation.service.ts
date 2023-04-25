@@ -2,6 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { Conversation } from '../models/conversation.model';
 import { UserService } from './user.service';
 import { Message } from '../models/message.model';
+import { User } from '../models/user.model';
+import { formatDate } from '../utils';
 
 @Injectable()
 export class ConversationService {
@@ -31,11 +33,45 @@ export class ConversationService {
     return conversation.conversationId;
   }
 
+  async getConversationsByTelegramId(telegramId: number): Promise<string> {
+    const conversations = await Conversation.findAll({
+      include: [
+        {
+          model: User,
+          where: { telegramId },
+          attributes: [],
+        },
+      ],
+    });
+
+    console.log(conversations);
+
+    return conversations
+      .map((conversation) => [
+        `ID: ${conversation.conversationId}\nConversation Theme: ${
+          conversation.conversationTopic
+        }\nCreated at: ${formatDate(conversation.createdAt)}`,
+      ])
+      .join('\n\n');
+  }
+
   async getConversationHistory(conversationId: number): Promise<Message[]> {
     const conversation = await Conversation.findByPk(conversationId, {
       include: [Message],
     });
 
     return conversation.messages;
+  }
+
+  async updateConversationTopic(
+    conversationId: number,
+    conversationTopic: string,
+  ): Promise<void> {
+    const conversation = await Conversation.findByPk(conversationId);
+
+    if (conversation) {
+      conversation.conversationTopic = conversationTopic;
+      await conversation.save();
+    }
   }
 }

@@ -94,6 +94,7 @@ export class MessageService {
     const botResponse = await this.openAiService.getResponse(
       conversationId,
       formattedHistory,
+      '',
     );
 
     ctx.reply(botResponse, endConversationKeyboard);

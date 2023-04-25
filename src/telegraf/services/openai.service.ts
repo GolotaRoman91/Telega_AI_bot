@@ -13,17 +13,21 @@ export class OpenAiService {
   async getResponse(
     conversationId: number,
     conversationHistory: Array<{ role: string; content: string }>,
+    prompt: string,
   ): Promise<string> {
     try {
       console.log('Sending data to OpenAI:', {
         model: 'gpt-3.5-turbo',
-        messages: conversationHistory,
+        messages: [...conversationHistory, { role: 'system', content: prompt }],
       });
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {
           model: 'gpt-3.5-turbo',
-          messages: conversationHistory,
+          messages: [
+            ...conversationHistory,
+            { role: 'system', content: prompt },
+          ],
         },
         {
           headers: {

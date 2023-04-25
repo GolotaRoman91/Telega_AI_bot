@@ -6,12 +6,14 @@ import {
   endConversationKeyboard,
   postConversationKeyboard,
 } from '../markup-utils';
+import { OpenAiService } from './openai.service';
 
 @Injectable()
 export class CallbackQueryService {
   constructor(
     private conversationService: ConversationService,
     private userService: UserService,
+    private openAiService: OpenAiService,
   ) {}
 
   handleCallbackQuery(ctx: Context, userStartedConversation: Set<number>) {
@@ -37,9 +39,9 @@ export class CallbackQueryService {
 
     try {
       const conversationIds =
-        await this.userService.getConversationsByTelegramId(telegramId);
+        await this.conversationService.getConversationsByTelegramId(telegramId);
       ctx.reply(
-        `Here is the list of conversation IDs for user ${telegramId}: ${conversationIds}`,
+        `Here is the list of conversation IDs for user ${telegramId}:\n${conversationIds}`,
       );
     } catch (error) {
       console.error('Error fetching conversations:', error);
@@ -62,14 +64,39 @@ export class CallbackQueryService {
     );
   }
 
-  private endConversationHandler(
+  private async endConversationHandler(
     ctx: Context,
     userId: number,
     userStartedConversation: Set<number>,
   ) {
+    const conversationId = await this.conversationService.getConversationId(
+      userId,
+    );
+
+    if (conversationId !== null) {
+      const conversationHistory =
+        await this.conversationService.getConversationHistory(conversationId);
+
+      const formattedHistory = conversationHistory.map((msg) => ({
+        role: msg.sender,
+        content: msg.content,
+      }));
+
+      const conversationTopic = await this.openAiService.getResponse(
+        conversationId,
+        formattedHistory,
+        'Come up with a title for the topic of this conversation', // Add this line as an additional parameter
+      );
+
+      await this.conversationService.updateConversationTopic(
+        conversationId,
+        conversationTopic,
+      );
+    }
+
     userStartedConversation.delete(userId);
     ctx.reply(
-      'Conversation has ended. Please select an action to proceed.',
+      'Conversation has ended. The conversation topic has been saved. Please select an action to proceed.',
       postConversationKeyboard,
     );
   }
