@@ -3,6 +3,7 @@ import { Conversation } from '../models/conversation.model';
 import { UserService } from './user.service';
 import { Message } from '../models/message.model';
 import { User } from '../models/user.model';
+import { formatDate } from '../utils';
 
 @Injectable()
 export class ConversationService {
@@ -44,7 +45,11 @@ export class ConversationService {
     });
 
     return conversations
-      .map((conversation) => conversation.conversationId)
+      .map((conversation) => [
+        `ID: ${conversation.conversationId} Created at: ${formatDate(
+          conversation.createdAt,
+        )}`,
+      ])
       .join('\n');
   }
 
