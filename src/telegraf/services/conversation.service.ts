@@ -45,7 +45,7 @@ export class ConversationService {
 
     return conversations
       .map((conversation) => conversation.conversationId)
-      .join(', ');
+      .join('\n');
   }
 
   async getConversationHistory(conversationId: number): Promise<Message[]> {
