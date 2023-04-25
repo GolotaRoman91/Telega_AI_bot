@@ -44,6 +44,8 @@ export class ConversationService {
       ],
     });
 
+    console.log(conversations);
+
     return conversations
       .map((conversation) => [
         `ID: ${conversation.conversationId} Created at: ${formatDate(
@@ -59,5 +61,17 @@ export class ConversationService {
     });
 
     return conversation.messages;
+  }
+
+  async updateConversationTopic(
+    conversationId: number,
+    conversationTopic: string,
+  ): Promise<void> {
+    const conversation = await Conversation.findByPk(conversationId);
+
+    if (conversation) {
+      conversation.conversationTopic = conversationTopic;
+      await conversation.save();
+    }
   }
 }

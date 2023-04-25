@@ -19,6 +19,9 @@ export class Conversation extends Model {
   @Column(DataType.INTEGER)
   conversationId: number;
 
+  @Column(DataType.TEXT)
+  conversationTopic: string;
+
   @ForeignKey(() => User)
   @Column(DataType.INTEGER)
   userId: number;
