@@ -48,11 +48,11 @@ export class ConversationService {
 
     return conversations
       .map((conversation) => [
-        `ID: ${conversation.conversationId} Created at: ${formatDate(
-          conversation.createdAt,
-        )}`,
+        `ID: ${conversation.conversationId}\nConversation Theme: ${
+          conversation.conversationTopic
+        }\nCreated at: ${formatDate(conversation.createdAt)}`,
       ])
-      .join('\n');
+      .join('\n\n');
   }
 
   async getConversationHistory(conversationId: number): Promise<Message[]> {
