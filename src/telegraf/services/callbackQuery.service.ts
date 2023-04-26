@@ -1,5 +1,4 @@
 import { ConversationService } from './conversation.service';
-import { UserService } from './user.service';
 import { Injectable } from '@nestjs/common';
 import { Context } from 'telegraf';
 import {
@@ -12,7 +11,6 @@ import { OpenAiService } from './openai.service';
 export class CallbackQueryService {
   constructor(
     private conversationService: ConversationService,
-    private userService: UserService,
     private openAiService: OpenAiService,
   ) {}
 
@@ -85,7 +83,7 @@ export class CallbackQueryService {
       const conversationTopic = await this.openAiService.getResponse(
         conversationId,
         formattedHistory,
-        'Come up with a title for the topic of this conversation', // Add this line as an additional parameter
+        'Come up with a title for the topic of this conversation',
       );
 
       await this.conversationService.updateConversationTopic(
