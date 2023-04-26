@@ -1,14 +1,12 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import axios from 'axios';
 import { MessageService } from './message.service';
-import { ConversationService } from './conversation.service';
 
 @Injectable()
 export class OpenAiService {
   constructor(
     @Inject(forwardRef(() => MessageService))
     private messageService: MessageService,
-    private conversationService: ConversationService,
   ) {}
   async getResponse(
     conversationId: number,
