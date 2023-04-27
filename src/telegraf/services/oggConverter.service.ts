@@ -1,6 +1,6 @@
 import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
-import { createWriteStream } from 'fs';
+import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { resolve } from 'path';
 import { DIRNAME_TOKEN } from '../telegraf.constants';
 
@@ -12,20 +12,23 @@ export class OggConverterService {
     this.__dirname = __dirname;
   }
 
-  //   toMp3() {}
-
   async create(url, filename) {
     try {
-      const oggPath = resolve(__dirname, '../../../voices', `${filename}.ogg`);
+      const voicesDir = resolve(this.__dirname, '../../voices');
+      if (!existsSync(voicesDir)) {
+        mkdirSync(voicesDir);
+      }
+      const oggPath = resolve(voicesDir, `${filename}.ogg`);
       const response = await axios({
         method: 'get',
         url,
         responseType: 'stream',
       });
-      return new Promise(() => {
-        const straem = createWriteStream(oggPath);
-        response.data.pipe(straem);
-        straem.on('finish', () => resolve(oggPath));
+      return new Promise((resolve, reject) => {
+        const stream = createWriteStream(oggPath);
+        response.data.pipe(stream);
+        stream.on('finish', () => resolve(oggPath));
+        stream.on('error', (error) => reject(error));
       });
     } catch (e) {
       console.log('Error while creating ogg', e.message);
