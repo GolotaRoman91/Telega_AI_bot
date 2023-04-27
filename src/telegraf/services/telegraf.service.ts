@@ -1,3 +1,4 @@
+import { OggConverterService } from './oggConverter.service';
 import { Injectable } from '@nestjs/common';
 import { Telegraf, Context } from 'telegraf';
 import { postConversationKeyboard } from '../markup-utils';
@@ -14,6 +15,7 @@ export class TelegrafService {
     private callbackQueryService: CallbackQueryService,
     private userService: UserService,
     private messageHandlerService: MessageService,
+    private OggConverterHandlerService: OggConverterService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
     this.registerHandlers();
@@ -27,6 +29,11 @@ export class TelegrafService {
     this.bot.on('text', async (ctx) => await this.handleTextMessage(ctx));
     this.bot.on('voice', async (ctx) => {
       const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
+      const userId = String(ctx.message.from.id);
+      const oggPath = await this.OggConverterHandlerService.create(
+        link.href,
+        userId,
+      );
       await ctx.reply(JSON.stringify(link, null, 2));
     });
   }

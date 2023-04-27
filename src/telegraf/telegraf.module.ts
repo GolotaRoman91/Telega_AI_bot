@@ -11,6 +11,8 @@ import { ConversationService } from './services/conversation.service';
 import { MessageService } from './services/message.service';
 import { UserService } from './services/user.service';
 import { CallbackQueryService } from './services/callbackQuery.service';
+import { OggConverterService } from './services/oggConverter.service';
+import { DIRNAME_TOKEN } from './telegraf.constants';
 
 @Module({
   imports: [SequelizeModule.forFeature([User, Conversation, Message])],
@@ -21,6 +23,11 @@ import { CallbackQueryService } from './services/callbackQuery.service';
     CallbackQueryService,
     ConversationService,
     OpenAiService,
+    {
+      provide: DIRNAME_TOKEN,
+      useValue: __dirname,
+    },
+    OggConverterService,
     {
       provide: Telegraf,
       useFactory: (telegrafService: TelegrafService) =>
