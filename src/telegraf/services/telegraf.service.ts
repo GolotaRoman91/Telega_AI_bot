@@ -25,6 +25,10 @@ export class TelegrafService {
     this.bot.command('start', (ctx) => this.handleStartCommand(ctx));
     this.bot.on('callback_query', (ctx) => this.handleCallbackQuery(ctx));
     this.bot.on('text', async (ctx) => await this.handleTextMessage(ctx));
+    this.bot.on('voice', async (ctx) => {
+      const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
+      await ctx.reply(JSON.stringify(link, null, 2));
+    });
   }
 
   private async handleStartCommand(ctx: Context) {
