@@ -15,7 +15,7 @@ export class TelegrafService {
     private callbackQueryService: CallbackQueryService,
     private userService: UserService,
     private messageHandlerService: MessageService,
-    private OggConverterHandlerService: OggConverterService,
+    private oggConverterService: OggConverterService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
     this.registerHandlers();
@@ -27,19 +27,7 @@ export class TelegrafService {
     this.bot.command('start', (ctx) => this.handleStartCommand(ctx));
     this.bot.on('callback_query', (ctx) => this.handleCallbackQuery(ctx));
     this.bot.on('text', async (ctx) => await this.handleTextMessage(ctx));
-    this.bot.on('voice', async (ctx) => {
-      const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
-      const userId = String(ctx.message?.from?.id);
-      const oggPath = await this.OggConverterHandlerService.create(
-        link.href,
-        userId,
-      );
-      const mp3Path = await this.OggConverterHandlerService.toMp3(
-        oggPath,
-        userId,
-      );
-      await ctx.reply(mp3Path as string);
-    });
+    this.bot.on('voice', async (ctx) => await this.handleVoiceMessage(ctx));
   }
 
   private async handleStartCommand(ctx: Context) {
@@ -68,6 +56,18 @@ export class TelegrafService {
         userId,
         this.userStartedConversation,
       );
+    }
+  }
+
+  private async handleVoiceMessage(ctx: Context) {
+    const message = ctx.message as any;
+
+    if (message.voice) {
+      const link = await ctx.telegram.getFileLink(message.voice.file_id);
+      const userId = String(message?.from?.id);
+      const oggPath = await this.oggConverterService.create(link.href, userId);
+      const mp3Path = await this.oggConverterService.toMp3(oggPath, userId);
+      await ctx.reply(mp3Path as string);
     }
   }
 
