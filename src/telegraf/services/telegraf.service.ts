@@ -5,6 +5,7 @@ import { postConversationKeyboard } from '../markup-utils';
 import { UserService } from './user.service';
 import { CallbackQueryService } from './callbackQuery.service';
 import { MessageService } from './message.service';
+import { VoiceMessageService } from './voiceMessage.service';
 
 @Injectable()
 export class TelegrafService {
@@ -16,6 +17,7 @@ export class TelegrafService {
     private userService: UserService,
     private messageHandlerService: MessageService,
     private oggConverterService: OggConverterService,
+    private voiceMessageService: VoiceMessageService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
     this.registerHandlers();
@@ -62,30 +64,18 @@ export class TelegrafService {
   private async handleVoiceMessage(ctx: Context) {
     const userId = ctx.message?.from?.id;
 
-    if (
-      userId &&
-      this.messageHandlerService.isUserInConversation(
+    if (userId) {
+      await this.voiceMessageService.handleVoiceMessage(
+        ctx,
         userId,
         this.userStartedConversation,
-      )
-    ) {
-      const message = ctx.message as any;
-
-      if (message.voice) {
-        const link = await ctx.telegram.getFileLink(message.voice.file_id);
-        const userIdString = String(userId);
-        const oggPath = await this.oggConverterService.create(
-          link.href,
-          userIdString,
-        );
-        const mp3Path = await this.oggConverterService.toMp3(
-          oggPath,
-          userIdString,
-        );
-        await ctx.reply(mp3Path as string);
-      }
-    } else {
-      this.messageHandlerService.promptUserToStartConversation(ctx);
+        this.messageHandlerService.isUserInConversation.bind(
+          this.messageHandlerService,
+        ),
+        this.messageHandlerService.promptUserToStartConversation.bind(
+          this.messageHandlerService,
+        ),
+      );
     }
   }
 

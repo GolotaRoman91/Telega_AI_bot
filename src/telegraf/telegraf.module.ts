@@ -13,6 +13,7 @@ import { UserService } from './services/user.service';
 import { CallbackQueryService } from './services/callbackQuery.service';
 import { OggConverterService } from './services/oggConverter.service';
 import { DIRNAME_TOKEN } from './telegraf.constants';
+import { VoiceMessageService } from './services/voiceMessage.service';
 
 @Module({
   imports: [SequelizeModule.forFeature([User, Conversation, Message])],
@@ -23,6 +24,7 @@ import { DIRNAME_TOKEN } from './telegraf.constants';
     CallbackQueryService,
     ConversationService,
     OpenAiService,
+    VoiceMessageService,
     {
       provide: DIRNAME_TOKEN,
       useValue: __dirname,
