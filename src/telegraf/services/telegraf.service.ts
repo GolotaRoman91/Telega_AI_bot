@@ -5,6 +5,7 @@ import { postConversationKeyboard } from '../markup-utils';
 import { UserService } from './user.service';
 import { CallbackQueryService } from './callbackQuery.service';
 import { MessageService } from './message.service';
+import { VoiceMessageService } from './voiceMessage.service';
 
 @Injectable()
 export class TelegrafService {
@@ -15,7 +16,8 @@ export class TelegrafService {
     private callbackQueryService: CallbackQueryService,
     private userService: UserService,
     private messageHandlerService: MessageService,
-    private OggConverterHandlerService: OggConverterService,
+    private oggConverterService: OggConverterService,
+    private voiceMessageService: VoiceMessageService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
     this.registerHandlers();
@@ -27,15 +29,7 @@ export class TelegrafService {
     this.bot.command('start', (ctx) => this.handleStartCommand(ctx));
     this.bot.on('callback_query', (ctx) => this.handleCallbackQuery(ctx));
     this.bot.on('text', async (ctx) => await this.handleTextMessage(ctx));
-    this.bot.on('voice', async (ctx) => {
-      const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
-      const userId = String(ctx.message.from.id);
-      const oggPath = await this.OggConverterHandlerService.create(
-        link.href,
-        userId,
-      );
-      await ctx.reply(JSON.stringify(link, null, 2));
-    });
+    this.bot.on('voice', async (ctx) => await this.handleVoiceMessage(ctx));
   }
 
   private async handleStartCommand(ctx: Context) {
@@ -63,6 +57,24 @@ export class TelegrafService {
         ctx,
         userId,
         this.userStartedConversation,
+      );
+    }
+  }
+
+  private async handleVoiceMessage(ctx: Context) {
+    const userId = ctx.message?.from?.id;
+
+    if (userId) {
+      await this.voiceMessageService.handleVoiceMessage(
+        ctx,
+        userId,
+        this.userStartedConversation,
+        this.messageHandlerService.isUserInConversation.bind(
+          this.messageHandlerService,
+        ),
+        this.messageHandlerService.promptUserToStartConversation.bind(
+          this.messageHandlerService,
+        ),
       );
     }
   }
