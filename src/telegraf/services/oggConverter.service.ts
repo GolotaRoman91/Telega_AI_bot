@@ -2,10 +2,11 @@ import { Inject, Injectable } from '@nestjs/common';
 import axios from 'axios';
 import * as ffmpeg from 'fluent-ffmpeg';
 import * as installer from '@ffmpeg-installer/ffmpeg';
+import * as fs from 'fs';
 import { createWriteStream, existsSync, mkdirSync } from 'fs';
 import { resolve } from 'path';
 import { DIRNAME_TOKEN } from '../telegraf.constants';
-import * as fs from 'fs';
+import { removeFile } from '../utils';
 
 @Injectable()
 export class OggConverterService {
@@ -21,13 +22,15 @@ export class OggConverterService {
       const voicesDir = resolve(this.__dirname, '../../voices');
       const outputPath = resolve(voicesDir, `${output}.mp3`);
 
-      // Check if input file exists before calling ffmpeg()
       if (fs.existsSync(input)) {
         return new Promise((resolve, reject) => {
           ffmpeg(input)
             .audioBitrate(128)
             .save(outputPath)
-            .on('end', () => resolve(outputPath))
+            .on('end', () => {
+              removeFile(input);
+              resolve(outputPath);
+            })
             .on('error', reject);
         });
       } else {
