@@ -29,12 +29,16 @@ export class TelegrafService {
     this.bot.on('text', async (ctx) => await this.handleTextMessage(ctx));
     this.bot.on('voice', async (ctx) => {
       const link = await ctx.telegram.getFileLink(ctx.message.voice.file_id);
-      const userId = String(ctx.message.from.id);
+      const userId = String(ctx.message?.from?.id);
       const oggPath = await this.OggConverterHandlerService.create(
         link.href,
         userId,
       );
-      await ctx.reply(JSON.stringify(link, null, 2));
+      const mp3Path = await this.OggConverterHandlerService.toMp3(
+        oggPath,
+        userId,
+      );
+      await ctx.reply(mp3Path as string);
     });
   }
 
