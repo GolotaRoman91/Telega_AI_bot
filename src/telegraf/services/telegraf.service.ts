@@ -60,14 +60,32 @@ export class TelegrafService {
   }
 
   private async handleVoiceMessage(ctx: Context) {
-    const message = ctx.message as any;
+    const userId = ctx.message?.from?.id;
 
-    if (message.voice) {
-      const link = await ctx.telegram.getFileLink(message.voice.file_id);
-      const userId = String(message?.from?.id);
-      const oggPath = await this.oggConverterService.create(link.href, userId);
-      const mp3Path = await this.oggConverterService.toMp3(oggPath, userId);
-      await ctx.reply(mp3Path as string);
+    if (
+      userId &&
+      this.messageHandlerService.isUserInConversation(
+        userId,
+        this.userStartedConversation,
+      )
+    ) {
+      const message = ctx.message as any;
+
+      if (message.voice) {
+        const link = await ctx.telegram.getFileLink(message.voice.file_id);
+        const userIdString = String(userId);
+        const oggPath = await this.oggConverterService.create(
+          link.href,
+          userIdString,
+        );
+        const mp3Path = await this.oggConverterService.toMp3(
+          oggPath,
+          userIdString,
+        );
+        await ctx.reply(mp3Path as string);
+      }
+    } else {
+      this.messageHandlerService.promptUserToStartConversation(ctx);
     }
   }
 

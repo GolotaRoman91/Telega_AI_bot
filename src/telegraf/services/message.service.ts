@@ -66,14 +66,14 @@ export class MessageService {
     }
   }
 
-  private isUserInConversation(
+  isUserInConversation(
     userId: number,
     userStartedConversation: Set<number>,
   ): boolean {
     return userStartedConversation.has(userId);
   }
 
-  private promptUserToStartConversation(ctx: Context) {
+  promptUserToStartConversation(ctx: Context) {
     ctx.reply('Please select an action to proceed.', startConversationKeyboard);
   }
 
