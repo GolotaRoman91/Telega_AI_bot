@@ -86,7 +86,6 @@ export class MessageService {
     conversationId: number,
     messageText: string,
   ) {
-    // const message = ctx.message as TelegrafMessage.TextMessage;
     await this.createUserMessage(conversationId, messageText);
 
     const conversationHistory =
