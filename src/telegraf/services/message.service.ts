@@ -1,6 +1,5 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { Message } from '../models/message.model';
-import { Message as TelegrafMessage } from 'telegraf/typings/core/types/typegram';
 import {
   endConversationKeyboard,
   startConversationKeyboard,
