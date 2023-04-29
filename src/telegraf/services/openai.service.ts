@@ -1,13 +1,21 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import axios from 'axios';
 import { MessageService } from './message.service';
+import { Configuration, OpenAIApi } from 'openai';
+import { createReadStream } from 'fs';
 
 @Injectable()
 export class OpenAiService {
+  openai: any;
   constructor(
     @Inject(forwardRef(() => MessageService))
     private messageService: MessageService,
-  ) {}
+  ) {
+    const configuration = new Configuration({
+      apiKey: process.env.OPENAI_API_KEY,
+    });
+    this.openai = new OpenAIApi(configuration);
+  }
   async getResponse(
     conversationId: number,
     conversationHistory: Array<{ role: string; content: string }>,
@@ -42,5 +50,15 @@ export class OpenAiService {
       console.error('Error sending request to OpenAI:', error.message);
       return 'An error occurred while processing your request.';
     }
+  }
+
+  async transcription(filepath) {
+    try {
+      const response = await this.openai.createTranscription(
+        createReadStream(filepath),
+        'whisper-1',
+      );
+      return response.data.text;
+    } catch (e) {}
   }
 }
