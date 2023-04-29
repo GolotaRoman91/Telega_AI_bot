@@ -62,7 +62,11 @@ export class MessageService {
     );
 
     if (conversationId !== null) {
-      await this.processUserMessage(ctx, conversationId);
+      if ('text' in ctx.message) {
+        await this.processUserMessage(ctx, conversationId, ctx.message.text);
+      } else {
+        console.warn('Unexpected message type received');
+      }
     }
   }
 
@@ -77,9 +81,13 @@ export class MessageService {
     ctx.reply('Please select an action to proceed.', startConversationKeyboard);
   }
 
-  private async processUserMessage(ctx: Context, conversationId: number) {
-    const message = ctx.message as TelegrafMessage.TextMessage;
-    await this.createUserMessage(conversationId, message.text);
+  async processUserMessage(
+    ctx: Context,
+    conversationId: number,
+    messageText: string,
+  ) {
+    // const message = ctx.message as TelegrafMessage.TextMessage;
+    await this.createUserMessage(conversationId, messageText);
 
     const conversationHistory =
       await this.conversationService.getConversationHistory(conversationId);
