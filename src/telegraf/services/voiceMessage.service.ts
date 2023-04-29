@@ -1,10 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { OggConverterService } from './oggConverter.service';
 import { Context } from 'telegraf';
+import { OpenAiService } from './openai.service';
+import { ConversationService } from './conversation.service';
+import { MessageService } from './message.service';
 
 @Injectable()
 export class VoiceMessageService {
-  constructor(private oggConverterService: OggConverterService) {}
+  constructor(
+    private oggConverterService: OggConverterService,
+    private openAiService: OpenAiService,
+    private conversationService: ConversationService,
+    private messageHandlerService: MessageService,
+  ) {}
 
   async handleVoiceMessage(
     ctx: Context,
@@ -30,7 +38,22 @@ export class VoiceMessageService {
           oggPath,
           userIdString,
         );
-        await ctx.reply(mp3Path as string);
+
+        const transcribedText: any = await this.openAiService.transcription(
+          mp3Path,
+        );
+        console.log(transcribedText);
+        const conversationId = await this.conversationService.getConversationId(
+          userId,
+        );
+
+        if (conversationId !== null) {
+          await this.messageHandlerService.processUserMessage(
+            ctx,
+            conversationId,
+            transcribedText,
+          );
+        }
       }
     } else {
       promptUserToStartConversation(ctx);

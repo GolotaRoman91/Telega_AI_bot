@@ -1,6 +1,5 @@
 import { Inject, Injectable, forwardRef } from '@nestjs/common';
 import { Message } from '../models/message.model';
-import { Message as TelegrafMessage } from 'telegraf/typings/core/types/typegram';
 import {
   endConversationKeyboard,
   startConversationKeyboard,
@@ -62,7 +61,11 @@ export class MessageService {
     );
 
     if (conversationId !== null) {
-      await this.processUserMessage(ctx, conversationId);
+      if ('text' in ctx.message) {
+        await this.processUserMessage(ctx, conversationId, ctx.message.text);
+      } else {
+        console.warn('Unexpected message type received');
+      }
     }
   }
 
@@ -77,9 +80,12 @@ export class MessageService {
     ctx.reply('Please select an action to proceed.', startConversationKeyboard);
   }
 
-  private async processUserMessage(ctx: Context, conversationId: number) {
-    const message = ctx.message as TelegrafMessage.TextMessage;
-    await this.createUserMessage(conversationId, message.text);
+  async processUserMessage(
+    ctx: Context,
+    conversationId: number,
+    messageText: string,
+  ) {
+    await this.createUserMessage(conversationId, messageText);
 
     const conversationHistory =
       await this.conversationService.getConversationHistory(conversationId);
