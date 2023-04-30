@@ -18,7 +18,11 @@ export class OpenAiService {
     this.openai = new OpenAIApi(configuration);
   }
 
-  async getResponse(conversationId, conversationHistory, prompt) {
+  async getResponse(
+    conversationId: number,
+    conversationHistory: Array<{ role: string; content: string }>,
+    prompt: string,
+  ) {
     try {
       console.log('Sending data to OpenAI:', {
         model: 'gpt-3.5-turbo',
@@ -52,7 +56,7 @@ export class OpenAiService {
     }
   }
 
-  async transcription(filePath) {
+  async transcription(filePath: string) {
     try {
       const response = await this.openai.createTranscription(
         createReadStream(filePath),
