@@ -6,7 +6,8 @@ import { createReadStream } from 'fs';
 
 @Injectable()
 export class OpenAiService {
-  openai: any;
+  private openai;
+
   constructor(
     @Inject(forwardRef(() => MessageService))
     private messageService: MessageService,
@@ -16,16 +17,14 @@ export class OpenAiService {
     });
     this.openai = new OpenAIApi(configuration);
   }
-  async getResponse(
-    conversationId: number,
-    conversationHistory: Array<{ role: string; content: string }>,
-    prompt: string,
-  ): Promise<string> {
+
+  async getResponse(conversationId, conversationHistory, prompt) {
     try {
       console.log('Sending data to OpenAI:', {
         model: 'gpt-3.5-turbo',
         messages: [...conversationHistory, { role: 'system', content: prompt }],
       });
+
       const response = await axios.post(
         'https://api.openai.com/v1/chat/completions',
         {
@@ -42,6 +41,7 @@ export class OpenAiService {
           },
         },
       );
+
       const reply = response.data.choices[0].message.content;
       await this.messageService.createBotMessage(conversationId, reply);
 
@@ -52,13 +52,16 @@ export class OpenAiService {
     }
   }
 
-  async transcription(filepath) {
+  async transcription(filePath) {
     try {
       const response = await this.openai.createTranscription(
-        createReadStream(filepath),
+        createReadStream(filePath),
         'whisper-1',
       );
       return response.data.text;
-    } catch (e) {}
+    } catch (error) {
+      console.error('Error transcribing file:', error.message);
+      return 'An error occurred while processing your transcription request.';
+    }
   }
 }
