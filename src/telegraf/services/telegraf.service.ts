@@ -1,4 +1,3 @@
-import { OggConverterService } from './oggConverter.service';
 import { Injectable } from '@nestjs/common';
 import { Telegraf, Context } from 'telegraf';
 import { postConversationKeyboard } from '../markup-utils';
@@ -16,7 +15,6 @@ export class TelegrafService {
     private callbackQueryService: CallbackQueryService,
     private userService: UserService,
     private messageHandlerService: MessageService,
-    private oggConverterService: OggConverterService,
     private voiceMessageService: VoiceMessageService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
@@ -38,7 +36,7 @@ export class TelegrafService {
     await this.userService.findOrCreateUser(telegramId);
 
     const welcomeMessage = `Welcome to the AI Assistant bot! 😊 I'm here to help you with any questions or concerns you may have. Feel free to ask me anything, and I'll do my best to assist you!`;
-
+    console.log(ctx.from);
     ctx.reply(welcomeMessage, postConversationKeyboard);
   }
 

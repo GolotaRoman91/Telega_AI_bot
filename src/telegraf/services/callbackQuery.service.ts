@@ -4,6 +4,7 @@ import { Context } from 'telegraf';
 import {
   endConversationKeyboard,
   postConversationKeyboard,
+  startConversationKeyboard,
 } from '../markup-utils';
 import { OpenAiService } from './openai.service';
 
@@ -40,6 +41,7 @@ export class CallbackQueryService {
         await this.conversationService.getConversationsByTelegramId(telegramId);
       ctx.reply(
         `Here is the list of conversation IDs for user ${telegramId}:\n${conversationIds}`,
+        startConversationKeyboard,
       );
     } catch (error) {
       console.error('Error fetching conversations:', error);
