@@ -11,20 +11,17 @@ export class VoiceMessageService {
     private oggConverterService: OggConverterService,
     private openAiService: OpenAiService,
     private conversationService: ConversationService,
-    private messageHandlerService: MessageService,
+    private messageService: MessageService,
   ) {}
 
   async handleVoiceMessage(
     ctx: Context,
     userId: number,
     userStartedConversation: Set<number>,
-    isUserInConversation: (
-      userId: number,
-      userStartedConversation: Set<number>,
-    ) => boolean,
-    promptUserToStartConversation: (ctx: Context) => void,
   ) {
-    if (isUserInConversation(userId, userStartedConversation)) {
+    if (
+      this.messageService.isUserInConversation(userId, userStartedConversation)
+    ) {
       const message = ctx.message as any;
 
       if (message.voice) {
@@ -38,17 +35,14 @@ export class VoiceMessageService {
           oggPath,
           userIdString,
         );
-
         const transcribedText: any = await this.openAiService.transcription(
           mp3Path,
         );
-        console.log(transcribedText);
         const conversationId = await this.conversationService.getConversationId(
           userId,
         );
-
         if (conversationId !== null) {
-          await this.messageHandlerService.processUserMessage(
+          await this.messageService.processUserMessage(
             ctx,
             conversationId,
             transcribedText,
@@ -56,7 +50,7 @@ export class VoiceMessageService {
         }
       }
     } else {
-      promptUserToStartConversation(ctx);
+      this.messageService.promptUserToStartConversation(ctx);
     }
   }
 }

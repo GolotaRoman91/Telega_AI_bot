@@ -14,7 +14,7 @@ export class TelegrafService {
   constructor(
     private callbackQueryService: CallbackQueryService,
     private userService: UserService,
-    private messageHandlerService: MessageService,
+    private messageService: MessageService,
     private voiceMessageService: VoiceMessageService,
   ) {
     this.bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
@@ -32,11 +32,8 @@ export class TelegrafService {
 
   private async handleStartCommand(ctx: Context) {
     const telegramId = ctx.from.id;
-
     await this.userService.findOrCreateUser(telegramId);
-
     const welcomeMessage = `Welcome to the AI Assistant bot! 😊 I'm here to help you with any questions or concerns you may have. Feel free to ask me anything, and I'll do my best to assist you!`;
-    console.log(ctx.from);
     ctx.reply(welcomeMessage, postConversationKeyboard);
   }
 
@@ -49,9 +46,8 @@ export class TelegrafService {
 
   private async handleTextMessage(ctx: Context) {
     const userId = ctx.message?.from?.id;
-
     if (userId) {
-      await this.messageHandlerService.processTextMessage(
+      await this.messageService.processTextMessage(
         ctx,
         userId,
         this.userStartedConversation,
@@ -61,18 +57,11 @@ export class TelegrafService {
 
   private async handleVoiceMessage(ctx: Context) {
     const userId = ctx.message?.from?.id;
-
     if (userId) {
       await this.voiceMessageService.handleVoiceMessage(
         ctx,
         userId,
         this.userStartedConversation,
-        this.messageHandlerService.isUserInConversation.bind(
-          this.messageHandlerService,
-        ),
-        this.messageHandlerService.promptUserToStartConversation.bind(
-          this.messageHandlerService,
-        ),
       );
     }
   }
