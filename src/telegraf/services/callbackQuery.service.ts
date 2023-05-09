@@ -39,14 +39,32 @@ export class CallbackQueryService {
     try {
       const conversationIds =
         await this.conversationService.getConversationsByTelegramId(telegramId);
+      console.log(conversationIds);
+
+      // Split the conversationIds into chunks of max 2000 characters
+      const maxMessageLength = 1000;
+      const chunks = [];
+
+      for (let i = 0; i < conversationIds.length; i += maxMessageLength) {
+        chunks.push(conversationIds.slice(i, i + maxMessageLength));
+      }
+
+      // Send each chunk as a separate message
+      for (const chunk of chunks) {
+        await ctx.reply(
+          `Here is a part of the conversation IDs for user ${telegramId}:\n${chunk}`,
+        );
+      }
+
+      // Send the startConversationKeyboard after all chunks have been sent
       ctx.reply(
-        `Here is the list of conversation IDs for user ${telegramId}:\n${conversationIds}`,
+        'All conversation IDs have been sent.',
         startConversationKeyboard,
       );
     } catch (error) {
       console.error('Error fetching conversations:', error);
       ctx.reply(
-        'An error occurred while fetching your conversations. Please try again later.',
+        'There was an error fetching your conversations. Please try again later.',
       );
     }
   }
