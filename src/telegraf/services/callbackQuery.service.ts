@@ -37,26 +37,36 @@ export class CallbackQueryService {
     const telegramId = ctx.callbackQuery.from.id;
 
     try {
-      const conversationIds =
+      const conversationsString =
         await this.conversationService.getConversationsByTelegramId(telegramId);
-      console.log(conversationIds);
 
-      // Split the conversationIds into chunks of max 2000 characters
+      const conversationEntries = conversationsString.split('\n');
+
       const maxMessageLength = 1000;
       const chunks = [];
+      let currentChunk = '';
 
-      for (let i = 0; i < conversationIds.length; i += maxMessageLength) {
-        chunks.push(conversationIds.slice(i, i + maxMessageLength));
+      for (const entry of conversationEntries) {
+        const entryString = entry + '\n';
+
+        if (currentChunk.length + entryString.length > maxMessageLength) {
+          chunks.push(currentChunk);
+          currentChunk = '';
+        }
+
+        currentChunk += entryString;
       }
 
-      // Send each chunk as a separate message
+      if (currentChunk.length > 0) {
+        chunks.push(currentChunk);
+      }
+
       for (const chunk of chunks) {
         await ctx.reply(
           `Here is a part of the conversation IDs for user ${telegramId}:\n${chunk}`,
         );
       }
 
-      // Send the startConversationKeyboard after all chunks have been sent
       ctx.reply(
         'All conversation IDs have been sent.',
         startConversationKeyboard,
