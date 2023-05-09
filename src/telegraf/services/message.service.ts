@@ -85,6 +85,7 @@ export class MessageService {
     conversationId: number,
     messageText: string,
   ) {
+    ctx.reply('Let me think...');
     await this.createUserMessage(conversationId, messageText);
 
     const conversationHistory =

@@ -37,16 +37,44 @@ export class CallbackQueryService {
     const telegramId = ctx.callbackQuery.from.id;
 
     try {
-      const conversationIds =
+      const conversationsString =
         await this.conversationService.getConversationsByTelegramId(telegramId);
+
+      const conversationEntries = conversationsString.split('\n');
+
+      const maxMessageLength = 1000;
+      const chunks = [];
+      let currentChunk = '';
+
+      for (const entry of conversationEntries) {
+        const entryString = entry + '\n';
+
+        if (currentChunk.length + entryString.length > maxMessageLength) {
+          chunks.push(currentChunk);
+          currentChunk = '';
+        }
+
+        currentChunk += entryString;
+      }
+
+      if (currentChunk.length > 0) {
+        chunks.push(currentChunk);
+      }
+
+      for (const chunk of chunks) {
+        await ctx.reply(
+          `Here is a part of the conversation IDs for user ${telegramId}:\n${chunk}`,
+        );
+      }
+
       ctx.reply(
-        `Here is the list of conversation IDs for user ${telegramId}:\n${conversationIds}`,
+        'All conversation IDs have been sent.',
         startConversationKeyboard,
       );
     } catch (error) {
       console.error('Error fetching conversations:', error);
       ctx.reply(
-        'An error occurred while fetching your conversations. Please try again later.',
+        'There was an error fetching your conversations. Please try again later.',
       );
     }
   }
