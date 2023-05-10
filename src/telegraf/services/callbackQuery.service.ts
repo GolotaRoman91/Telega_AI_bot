@@ -62,9 +62,7 @@ export class CallbackQueryService {
       }
 
       for (const chunk of chunks) {
-        await ctx.reply(
-          `Here is a part of the conversation IDs for user ${telegramId}:\n${chunk}`,
-        );
+        await ctx.reply(chunk);
       }
 
       ctx.reply(
