@@ -33,7 +33,7 @@ export class TelegrafService {
   private async handleStartCommand(ctx: Context) {
     const telegramId = ctx.from.id;
     await this.userService.findOrCreateUser(telegramId);
-    const welcomeMessage = `Welcome to the AI Assistant bot! 😊 I'm here to help you with any questions or concerns you may have. Feel free to ask me anything, and I'll do my best to assist you!`;
+    const welcomeMessage = `Welcome to the AI Assistant bot! 😊 I'm here to help you with any questions or concerns you may have. Feel free to ask me anything, and I'll do my best to assist you! You can send me text or voice messages!`;
     ctx.reply(welcomeMessage, postConversationKeyboard);
   }
 
