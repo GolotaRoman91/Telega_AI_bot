@@ -106,11 +106,7 @@ export class MessageService {
     }
 
     console.log('---------------------------------------');
-    console.log(
-      formattedHistory.reduce((total, message) => {
-        return total + message.content.length;
-      }, 0),
-    );
+    console.log(totalCharacters);
     console.log('---------------------------------------');
 
     const botResponse = await this.openAiService.getResponse(
