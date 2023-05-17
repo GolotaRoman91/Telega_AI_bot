@@ -7,6 +7,7 @@ import {
 import { Context } from 'telegraf';
 import { ConversationService } from './conversation.service';
 import { OpenAiService } from './openai.service';
+import { HistoryTrimmingService } from './historyTrimming.service';
 
 @Injectable()
 export class MessageService {
@@ -14,6 +15,7 @@ export class MessageService {
     private conversationService: ConversationService,
     @Inject(forwardRef(() => OpenAiService))
     private openAiService: OpenAiService,
+    private historyTrimmingService: HistoryTrimmingService,
   ) {}
 
   async createUserMessage(
@@ -91,23 +93,15 @@ export class MessageService {
     const conversationHistory =
       await this.conversationService.getConversationHistory(conversationId);
 
-    const formattedHistory = conversationHistory.map((msg) => ({
+    let formattedHistory = conversationHistory.map((msg) => ({
       role: msg.sender,
       content: msg.content,
     }));
 
-    let totalCharacters = formattedHistory.reduce((total, message) => {
-      return total + message.content.length;
-    }, 0);
-
-    while (totalCharacters > 3000) {
-      const removedMessage = formattedHistory.shift();
-      totalCharacters -= removedMessage.content.length;
-    }
-
-    console.log('---------------------------------------');
-    console.log(totalCharacters);
-    console.log('---------------------------------------');
+    formattedHistory = this.historyTrimmingService.trimToMaxCharacters(
+      formattedHistory,
+      3000,
+    );
 
     const botResponse = await this.openAiService.getResponse(
       conversationId,
