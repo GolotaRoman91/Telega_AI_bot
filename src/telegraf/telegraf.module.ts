@@ -14,6 +14,7 @@ import { CallbackQueryService } from './services/callbackQuery.service';
 import { OggConverterService } from './services/oggConverter.service';
 import { DIRNAME_TOKEN } from './telegraf.constants';
 import { VoiceMessageService } from './services/voiceMessage.service';
+import { HistoryTrimmingService } from './services/historyTrimming.service';
 
 @Module({
   imports: [SequelizeModule.forFeature([User, Conversation, Message])],
@@ -25,6 +26,7 @@ import { VoiceMessageService } from './services/voiceMessage.service';
     ConversationService,
     OpenAiService,
     VoiceMessageService,
+    HistoryTrimmingService,
     {
       provide: DIRNAME_TOKEN,
       useValue: __dirname,
