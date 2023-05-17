@@ -96,6 +96,23 @@ export class MessageService {
       content: msg.content,
     }));
 
+    let totalCharacters = formattedHistory.reduce((total, message) => {
+      return total + message.content.length;
+    }, 0);
+
+    while (totalCharacters > 3000) {
+      const removedMessage = formattedHistory.shift();
+      totalCharacters -= removedMessage.content.length;
+    }
+
+    console.log('---------------------------------------');
+    console.log(
+      formattedHistory.reduce((total, message) => {
+        return total + message.content.length;
+      }, 0),
+    );
+    console.log('---------------------------------------');
+
     const botResponse = await this.openAiService.getResponse(
       conversationId,
       formattedHistory,
