@@ -4,5 +4,5 @@ Topical problems:
 - Bot not working with private TG accounts
 
 Features for realisation:
-- Ability to return to the dialogue and the archive of dialogs
+- Ability to return to the dialogue from the archive of dialogs
 - Setting the context for the conversation
