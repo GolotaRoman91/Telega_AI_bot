@@ -8,3 +8,4 @@ Topical problems:
 Features for realisation:
 - Ability to return to the dialogue from the archive of dialogs
 - Setting the context for the conversation
+- Response by voice message
